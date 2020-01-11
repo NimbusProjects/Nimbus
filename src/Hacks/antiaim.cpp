@@ -78,7 +78,7 @@ static void DoAntiAim(QAngle& angle, bool bSend, CCSGOAnimState* animState, bool
 
 void AntiAim::CreateMove(CUserCmd* cmd)
 {
-    if (!Settings::AntiAim::enabled)
+    if (!Settings::AntiAim::enabled && !Settings::AntiAim::LBYBreaker::enabled)
         return;
 
     if (Settings::Aimbot::AimStep::enabled && Aimbot::aimStepInProgress)
