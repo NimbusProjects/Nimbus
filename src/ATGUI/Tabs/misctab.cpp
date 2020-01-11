@@ -432,6 +432,7 @@ void Misc::RenderTab()
 				ImGui::Checkbox(XORSTR("Adaptive Fake Lag"), &Settings::FakeLag::adaptive);
 				ImGui::Checkbox(XORSTR("Auto Accept"), &Settings::AutoAccept::enabled);
 				ImGui::Checkbox(XORSTR("Autoblock"), &Settings::Autoblock::enabled);
+				ImGui::Checkbox(XORSTR("Jump Throw"), &Settings::JumpThrow::enabled);
 				ImGui::Checkbox(XORSTR("Auto Defuse"), &Settings::AutoDefuse::enabled);
 				ImGui::Checkbox(XORSTR("Sniper Crosshair"), &Settings::SniperCrosshair::enabled);
 				ImGui::Checkbox(XORSTR("Disable post-processing"), &Settings::DisablePostProcessing::enabled);
@@ -445,6 +446,7 @@ void Misc::RenderTab()
 				ImGui::Checkbox(XORSTR("Show Ranks"), &Settings::ShowRanks::enabled);
 				ImGui::Checkbox(XORSTR("Screenshot Cleaner"), &Settings::ScreenshotCleaner::enabled);
 				UI::KeyBindButton(&Settings::Autoblock::key);
+				UI::KeyBindButton(&Settings::JumpThrow::key);
 				ImGui::Checkbox(XORSTR("Silent Defuse"), &Settings::AutoDefuse::silent);
 				ImGui::Checkbox(XORSTR("Attempt NoFall"), &Settings::NoFall::enabled);
 			}
