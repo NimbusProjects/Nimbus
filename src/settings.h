@@ -928,6 +928,12 @@ namespace Settings
 		extern bool showOnlyWhenShooting;
 	}
 
+	namespace Airstuck
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
 	namespace Autoblock
 	{
 		extern bool enabled;

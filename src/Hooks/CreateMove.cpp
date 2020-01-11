@@ -18,6 +18,7 @@
 #include "../Hacks/triggerbot.h"
 #include "../Hacks/autoknife.h"
 #include "../Hacks/antiaim.h"
+#include "../Hacks/airstuck.h"
 #include "../Hacks/fakelag.h"
 #include "../Hacks/esp.h"
 #include "../Hacks/tracereffect.h"
@@ -58,6 +59,7 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 			Triggerbot::CreateMove(cmd);
 			AutoKnife::CreateMove(cmd);
             AntiAim::CreateMove(cmd);
+			Airstuck::CreateMove(cmd);
 			FakeLag::CreateMove(cmd);
 			ESP::CreateMove(cmd);
 			TracerEffect::CreateMove(cmd);
