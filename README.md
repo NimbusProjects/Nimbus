@@ -1,11 +1,5 @@
-<p align="center">
-<img src="http://i.imgur.com/mCtrbIN.png">
-</p>
-===================
 
-# It looks like we are starting to get detected. Use public forks at your own Risk! 
-[![Join the chat at https://gitter.im/Aimtux-Fuzion/Lobby](https://img.shields.io/gitter/room/TechnologyAdvice/Stardust.svg?style=flat-square)](https://gitter.im/Aimtux-Fuzion/Lobby#)
-
+# This is a public self-maintained Fuzion fork.
 Want to chat or play with other Fuzion users? Join us on Gitter!
 
 
@@ -13,12 +7,10 @@ Want to chat or play with other Fuzion users? Join us on Gitter!
 
 A fully featured internal hack for *CounterStrike : Global Offensive* written in C++.
 
-## AUR Installation
+## What is Zedeware?
 
-* You can install Fuzion by using the AUR helper of your choice and installing the package [fuzion-git](https://aur.archlinux.org/packages/fuzion-git/)
-* Load Fuzion by using the command `fuzion-load`
-* Unload using `fuzion-unload`
-* As a development package, it will automatically update when you trigger your AUR helper, if a new commit has been pushed
+A Fuzion fork, created by me (Zede). I made this fork for the reason to learn coding and learn optimizing code.
+
 
 ## Compiling
 
@@ -50,11 +42,11 @@ sudo dnf install cmake gcc-c++ gdb git libstdc++-static mesa-libGL-devel SDL2-de
 #### Download Fuzion:
 
 ```bash
-git clone --recursive https://github.com/LWSS/Fuzion
+git clone --recursive https://github.com/Zedespook/zedeware
 ```
 
 ```bash
-cd Fuzion
+cd zedeware
 ```
 
 ===================
@@ -78,7 +70,7 @@ First of all, make sure CS:GO is open, it does not matter whether you are in gam
 
 Navigate to the directory where Fuzion was built if you have not ready.
 ```bash
-cd Fuzion
+cd zedeware
 ```
 
 Now, you can inject the hack with the `load` script
@@ -113,7 +105,7 @@ If you wish to unload the hack from the game, you can do so by entering the comm
 ```
 
 ## Configs
-
+# This is basically the same as for Fuzion, so you can use your Fuzion configs here as well.
 Configs are stored in a hidden directory in your home folder. Specifically 
 ```
 ~/.config/Fuzion
@@ -158,3 +150,7 @@ Special thanks to [@aixxe](http://www.github.com/aixxe/) ([aixxe.net](http://www
 This project was also originally based upon Atex's [Linux Basehook](http://unknowncheats.me/forum/counterstrike-global-offensive/181878-linux-basehook.html).
 
 [telans](https://github.com/telans) for the AUR package [fuzion-git](https://aur.archlinux.org/packages/fuzion-git/)
+
+Thank you [@LWSS](http://www.github.com/LWSS/) for still maintaining Fuzion and providing us with a great base.
+
+Special thanks to [@acuifex](http://www.github.com/acuifex/) for helping and motivating.
