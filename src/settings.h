@@ -749,6 +749,11 @@ namespace Settings
 			extern float size;
 		}
 
+		namespace Backtrack
+		{
+			extern bool enabled;
+		}
+
 		namespace Spread
 		{
 			extern bool enabled; // show current spread
@@ -868,6 +873,11 @@ namespace Settings
 		extern bool enabled;
 	}
 
+	namespace LagComp
+	{
+		extern bool enabled;
+	}
+
 	namespace AutoStrafe
 	{
 		extern bool enabled;
@@ -926,6 +936,12 @@ namespace Settings
 	{
 		extern bool enabled;
 		extern bool showOnlyWhenShooting;
+	}
+
+	namespace Airstuck
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
 	}
 
 	namespace Autoblock
@@ -1058,6 +1074,12 @@ namespace Settings
 		extern float distance;
         extern ShowedAngle type;
         extern ButtonCode_t key;
+	}
+
+	namespace JumpThrow
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
 	}
 
 	namespace NoFall

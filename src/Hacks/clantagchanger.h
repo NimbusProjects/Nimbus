@@ -3,8 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../SDK/IInputSystem.h"
-#include "../SDK/IClientEntity.h"
+#include "../SDK/definitions.h"
 
 namespace ClanTagChanger
 {
@@ -61,8 +60,7 @@ namespace ClanTagChanger
 	void UpdateClanTagCallback();
 
 	//Hooks
-	// void BeginFrame(float frameTime);
-	void CreateMove(CUserCmd* cmd);
+	void BeginFrame(float frameTime);
 }
 
 extern SendClanTagFn SendClanTag;

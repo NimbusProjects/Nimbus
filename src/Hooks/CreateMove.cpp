@@ -5,9 +5,11 @@
 
 #include "../Hacks/bhop.h"
 #include "../Hacks/noduckcooldown.h"
+#include "../Hacks/lagcomp.h"
 #include "../Hacks/autostrafe.h"
 #include "../Hacks/showranks.h"
 #include "../Hacks/autodefuse.h"
+#include "../Hacks/jumpthrow.h"
 #include "../Hacks/grenadehelper.h"
 #include "../Hacks/grenadeprediction.h"
 #include "../Hacks/edgejump.h"
@@ -17,11 +19,11 @@
 #include "../Hacks/triggerbot.h"
 #include "../Hacks/autoknife.h"
 #include "../Hacks/antiaim.h"
+#include "../Hacks/airstuck.h"
 #include "../Hacks/fakelag.h"
 #include "../Hacks/esp.h"
 #include "../Hacks/tracereffect.h"
 #include "../Hacks/nofall.h"
-#include "../Hacks/clantagchanger.h"
 
 bool CreateMove::sendPacket = true;
 QAngle CreateMove::lastTickViewAngles = QAngle(0, 0, 0);
@@ -46,18 +48,20 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 		AutoStrafe::CreateMove(cmd);
 		ShowRanks::CreateMove(cmd);
 		AutoDefuse::CreateMove(cmd);
+		JumpThrow::CreateMove(cmd);
 		GrenadeHelper::CreateMove(cmd);
         GrenadePrediction::CreateMove( cmd );
         EdgeJump::PrePredictionCreateMove(cmd);
 		Autoblock::CreateMove(cmd);
 		NoFall::PrePredictionCreateMove(cmd);
-		ClanTagChanger::CreateMove(cmd);
 
 		PredictionSystem::StartPrediction(cmd);
 			Aimbot::CreateMove(cmd);
+			LagComp::CreateMove(cmd);
 			Triggerbot::CreateMove(cmd);
 			AutoKnife::CreateMove(cmd);
             AntiAim::CreateMove(cmd);
+			Airstuck::CreateMove(cmd);
 			FakeLag::CreateMove(cmd);
 			ESP::CreateMove(cmd);
 			TracerEffect::CreateMove(cmd);
