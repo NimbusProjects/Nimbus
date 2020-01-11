@@ -14,6 +14,7 @@ typedef void (*BeginFrameFn) (void*, float);
 
 void Hooks::BeginFrame(void* thisptr, float frameTime)
 {
+	ClanTagChanger::BeginFrame(frameTime);
 	NameChanger::BeginFrame(frameTime);
 	NameStealer::BeginFrame(frameTime);
 	Spammer::BeginFrame(frameTime);
