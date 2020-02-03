@@ -46,11 +46,12 @@ sudo dnf install cmake gcc-c++ gdb git libstdc++-static mesa-libGL-devel SDL2-de
 #### Download Fuzion:
 
 ```bash
-git clone --recursive https://github.com/BellBush/Fuzion-1
+git clone --recursive https://github.com/Zedespook/zedeware
 ```
 
 ```bash
-cd Fuzion
+cd zedeware
+
 ```
 
 ===================
