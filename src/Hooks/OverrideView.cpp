@@ -6,6 +6,8 @@
 #include "../Hacks/fovchanger.h"
 #include "../Hacks/thirdperson.h"
 #include "../Hacks/grenadeprediction.h"
+#include "../Hacks/fakecrouch.h"
+
 
 float OverrideView::currentFOV = 90.0f;
 
@@ -20,6 +22,8 @@ void Hooks::OverrideView(void* thisptr, CViewSetup* pSetup)
 		ThirdPerson::OverrideView(pSetup);
 	}
 
+
+  FakeCrouch::OverrideView(pSetup);
 	OverrideView::currentFOV = pSetup->fov;
 
 	clientModeVMT->GetOriginalMethod<OverrideViewFn>(19)(thisptr, pSetup);

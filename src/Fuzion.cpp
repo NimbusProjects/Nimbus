@@ -6,10 +6,10 @@
 #include "fonts.h"
 #include "Hooks/hooks.h"
 #include "glhook.h"
+#include "Utils/bonemaps.h"
 
 #include "EventListener.h"
 #include "Utils/xorstring.h"
-#include "Utils/bonemaps.h"
 
 #include "Hacks/nosmoke.h"
 #include "Hacks/tracereffect.h"
@@ -31,9 +31,7 @@ void MainThread()
 {
 	Interfaces::FindInterfaces();
     Interfaces::DumpInterfaces();
-
     cvar->ConsoleDPrintf(XORSTR("Loading...\n"));
-
 	Hooker::FindSetNamedSkybox();
 	Hooker::FindViewRender();
 	Hooker::FindSDLInput();
@@ -52,7 +50,7 @@ void MainThread()
 	Hooker::FindLineGoesThroughSmoke();
 	Hooker::FindInitKeyValues();
 	Hooker::FindLoadFromBuffer();
-	//Hooker::FindVstdlibFunctions();
+//	Hooker::FindVstdlibFunctions();
 	Hooker::FindOverridePostProcessingDisable();
 	Hooker::HookSwapWindow();
 	Hooker::HookPollEvent();
@@ -83,6 +81,7 @@ void MainThread()
     engineVGuiVMT->ApplyVMT();
 
     gameEventsVMT = new VMT(gameEvents);
+	gameEventsVMT->HookVM(Hooks::FireEvent, 9);
 	gameEventsVMT->HookVM(Hooks::FireEventClientSide, 10);
 	gameEventsVMT->ApplyVMT();
 
@@ -99,6 +98,8 @@ void MainThread()
     materialVMT->HookVM(Hooks::OverrideConfig, 21);
     materialVMT->HookVM(Hooks::BeginFrame, 42);
 	materialVMT->ApplyVMT();
+
+
 
     modelRenderVMT = new VMT(modelRender);
     modelRenderVMT->HookVM(Hooks::DrawModelExecute, 21);
@@ -120,7 +121,7 @@ void MainThread()
     viewRenderVMT->HookVM(Hooks::RenderView, 6 );
     viewRenderVMT->HookVM(Hooks::RenderSmokePostViewmodel, 42);
     viewRenderVMT->ApplyVMT();
-    
+
 	eventListener = new EventListener({ XORSTR("cs_game_disconnected"), XORSTR("player_connect_full"), XORSTR("player_death"), XORSTR("item_purchase"), XORSTR("item_remove"), XORSTR("item_pickup"), XORSTR("player_hurt"), XORSTR("bomb_begindefuse"), XORSTR("enter_bombzone"), XORSTR("bomb_beginplant"), XORSTR("switch_team") });
 
 	if (Hooker::HookRecvProp(XORSTR("CBaseViewModel"), XORSTR("m_nSequence"), SkinChanger::sequenceHook))
@@ -131,13 +132,11 @@ void MainThread()
 	//Settings::LoadSettings();
 
 	srand(time(nullptr)); // Seed random # Generator so we can call rand() later
-
-    // Build bonemaps here if we are already in-game
     if( engine->IsInGame() ){
         BoneMaps::BuildAllBonemaps();
     }
 
-    cvar->ConsoleColorPrintf(ColorRGBA(0, 225, 0), XORSTR("\nFuzion Successfully loaded.\n"));
+    cvar->ConsoleColorPrintf(ColorRGBA(0, 225, 0), XORSTR(""));
 }
 /* Entrypoint to the Library. Called when loading */
 int __attribute__((constructor)) Startup()
@@ -176,5 +175,5 @@ void __attribute__((destructor)) Shutdown()
 
 	*s_bOverridePostProcessingDisable = false;
 
-	cvar->ConsoleColorPrintf(ColorRGBA(255, 0, 0), XORSTR("Fuzion Unloaded successfully.\n"));
+	cvar->ConsoleColorPrintf(ColorRGBA(255, 0, 0), XORSTR(""));
 }

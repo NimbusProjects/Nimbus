@@ -7,7 +7,6 @@
 
 #include "../../Hacks/aimbot.h"
 #include "../../Hacks/esp.h"
-#include "../../Hacks/resolver.h"
 #include "../../Hacks/clantagchanger.h"
 #include "../../Hacks/namechanger.h"
 
@@ -176,7 +175,7 @@ void PlayerList::RenderWindow()
 					else
 						Aimbot::friends.erase(std::find(Aimbot::friends.begin(), Aimbot::friends.end(), entityInformation.xuid));
 				}
-
+/*
 				bool shouldResolve = std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid) != Resolver::Players.end();
 				if (ImGui::Checkbox(XORSTR("Resolver"), &shouldResolve))
 				{
@@ -184,7 +183,7 @@ void PlayerList::RenderWindow()
 						Resolver::Players.push_back(entityInformation.xuid);
 					else
 						Resolver::Players.erase(std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid));
-				}
+				}*/
 			}
 			ImGui::NextColumn();
 			{

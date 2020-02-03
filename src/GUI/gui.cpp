@@ -78,7 +78,7 @@ static void SetupAndCheckPanels()
     }
     /* Setup our Custom Panel */
     if( !GUI::fuzionMain ){
-        cvar->ConsoleDPrintf("Creating Fuzion panel...\n");
+        cvar->ConsoleDPrintf("Creating NasaHook.cc panel...\n");
         // Get rid of newlines, they mess up the javascript syntax
         std::replace(mainXML.begin(), mainXML.end(), '\n', ' ');
         snprintf(jsCode, JS_MAX, cuckProtocol, mainXML.c_str());

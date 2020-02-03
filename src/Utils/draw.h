@@ -44,6 +44,7 @@ namespace Draw {
 	extern std::deque<DrawRequest> drawRequests;
 
 	// Surface
+	HFont CreateFont(const char* fontName, int size, int flag = (int)FontFlags::FONTFLAG_DROPSHADOW);
 	void Circle( Vector2D position, int segments, float radius, Color color );
 	void OutlinedCircle( int x0, int y0, int segments, int radius, Color col );
 	void FilledCircle( Vector2D position, int segments, float radius, Color color );

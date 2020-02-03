@@ -30,7 +30,7 @@ namespace Hooker
 	void FindLineGoesThroughSmoke();
 	void FindInitKeyValues();
 	void FindLoadFromBuffer();
-	//void FindVstdlibFunctions();
+//	void FindVstdlibFunctions();
 	void FindOverridePostProcessingDisable();
 	void HookSwapWindow();
 	void HookPollEvent();
@@ -38,8 +38,8 @@ namespace Hooker
 	void FindSetNamedSkybox();
 	void FindPanelArrayOffset();
 	void FindPlayerAnimStateOffset();
-    void FindPlayerAnimOverlayOffset();
+  void FindPlayerAnimOverlayOffset();
 	void FindSequenceActivity();
 	void FindAbsFunctions();
-	void FindItemSystem();
+  void FindItemSystem();
 }

@@ -116,10 +116,10 @@ void Interfaces::DumpInterfaces()
 		if (interface_name.empty())
 			continue;
 
-		ss << module << '\n';
+		ss << std::string(module) << "\n";
 
 		for (auto interface : interface_name)
-			ss << '\t' << interface << '\n';
+			ss << "\t" << interface << "\n";
 
 		ss << '\n';
 	}

@@ -15,10 +15,11 @@ namespace Hooks
 	bool CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd);
 	bool ShouldDrawCrosshair(void* thisptr);
 	float GetViewModelFOV(void* thisptr);
+	float compMinispec(void* thisptr);
 
 	/* GameEvents */
 	bool FireEventClientSide(void* thisptr, IGameEvent* event);
-
+	bool FireEvent(void* thisptr, IGameEvent* event, bool bDontBroadcast);
 	/* Input Internal */
 	void SetKeyCodeState(void* thisptr, ButtonCode_t code, bool bPressed);
 	void SetMouseCodeState(void* thisptr, ButtonCode_t code, MouseCodeState_t state);
@@ -43,8 +44,9 @@ namespace Hooks
 	void RenderView(void* thisptr, CViewSetup& setup, CViewSetup& hudViewSetup, unsigned int nClearFlags, int whatToDraw);
 	void RenderSmokePostViewmodel(void* thisptr);
 
+  //NetChannel
 
-
+  int SendDatagram(INetChannel* netchannel, void* data);
 
 	/* OpenGL Hooks */
 	int PumpWindowsMessageLoop(void* thisptr, void* unknown);
@@ -57,6 +59,7 @@ namespace Hooks
 namespace CreateMove
 {
 	extern bool sendPacket;
+	extern bool sendPacket2;
 	extern QAngle lastTickViewAngles;
 }
 

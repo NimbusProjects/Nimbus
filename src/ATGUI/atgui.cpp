@@ -4,6 +4,7 @@
 #include "../interfaces.h"
 #include "../settings.h"
 #include "../Utils/xorstring.h"
+#include <sstream>
 
 #include "Windows/colors.h"
 #include "Windows/configs.h"
@@ -17,10 +18,10 @@ bool UI::isVisible = false;
 
 bool Settings::ScreenshotCleaner::enabled = false;
 
-ColorVar Settings::UI::mainColor = ImColor(25, 25, 25, 225);
-ColorVar Settings::UI::bodyColor = ImColor(5, 5, 5, 200);
-ColorVar Settings::UI::fontColor = ImColor(255, 255, 255, 225);
-ColorVar Settings::UI::accentColor = ImColor(200, 100, 100, 200);
+ColorVar Settings::UI::mainColor = ImColor(25, 25, 25, 255);
+ColorVar Settings::UI::bodyColor = ImColor(5, 5, 5, 255);
+ColorVar Settings::UI::fontColor = ImColor(255, 255, 255, 255);
+ColorVar Settings::UI::accentColor = ImColor(39, 106, 219, 255);
 /* Window Position/Size Defaults */
 int Settings::UI::Windows::Colors::sizeX = 540;
 int Settings::UI::Windows::Colors::sizeY = 325;
@@ -104,7 +105,7 @@ void UI::SwapWindow()
 	if (engine->IsInGame())
 		return;
 
-    Draw::ImText( ImVec2( 4.f, 4.f ), ImColor( 255, 255, 255, 255 ), XORSTR( "Zedeware" ), nullptr, 0.0f, nullptr,
+    Draw::ImText( ImVec2( 4.f, 4.f ), Util::GetRainbowColor( 0.1f ), XORSTR( "Fuck." ), nullptr, 0.0f, nullptr,
                   ImFontFlags_Shadow );
 }
 

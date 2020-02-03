@@ -141,6 +141,13 @@ void Draw::GetTextSize( const char* text, HFont font, int& wide, int& tall ) {
 	surface->GetTextSize( font, wc.c_str(), wide, tall );
 }
 
+HFont Draw::CreateFont(const char* fontName, int size, int flag)
+{
+	HFont newFont = surface->CreateFont();
+	surface->SetFontGlyphSet(newFont, fontName, size, 0, 0, 0, flag);
+	return newFont;
+}
+
 Vector2D Draw::GetTextWSize( const wchar_t* text, HFont font ) {
 	int x_res, y_res;
 	surface->GetTextSize( font, text, x_res, y_res );
@@ -324,7 +331,7 @@ void Draw::AddCircle3D( const Vector &pos3D, float radius, ImColor color, int se
 void Draw::AddText( int x0, int y0, const char *text, ImColor color, ImFontFlags flags ) {
     DrawRequest req = {};
     if( text ){
-        strncpy( req.text, text, sizeof( req.text ) );
+        memcpy( req.text, text, sizeof( req.text ) );
         req.text[sizeof(req.text) - 1] = '\0';
     }
     req.type = DRAW_TEXT;

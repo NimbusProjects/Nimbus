@@ -16,8 +16,8 @@ struct tracerRecord
     tracerRecord(void* addr, char *weapName, char *effName, int freq)
     {
         address = addr;
-        strncpy(weaponName, weapName, 32);
-        strncpy(effectName, effName, 32);
+        memcpy(weaponName, weapName, 32);
+        memcpy(effectName, effName, 32);
         frequency = freq;
     }
     void* address;
@@ -165,13 +165,13 @@ void TracerEffect::CreateMove(CUserCmd* cmd) {
             *localWeapon->GetCSWpnData()->GetTracerFrequency() = 1;
             if( strlen(localWeapon->GetCSWpnData()->GetTracerEffect()) > strlen(tracerEffectNames[(int)TracerEffects_t::TASER]) )
             {
-                strncpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
+                memcpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
                         tracerEffectNames[(int)TracerEffects_t::TASER],
                         strlen(localWeapon->GetCSWpnData()->GetTracerEffect()));
             }
             else
             {   /* This could lead to some bad juju later, since we are making the string bigger */
-                strncpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
+                memcpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
                         tracerEffectNames[(int)TracerEffects_t::TASER],
                         strlen(tracerEffectNames[(int)TracerEffects_t::TASER]));
             }
@@ -189,13 +189,13 @@ void TracerEffect::CreateMove(CUserCmd* cmd) {
             *localWeapon->GetCSWpnData()->GetTracerFrequency() = Settings::TracerEffects::frequency;
             if( strlen(localWeapon->GetCSWpnData()->GetTracerEffect()) > strlen(tracerEffectNames[(int)Settings::TracerEffects::effect]) )
             {
-                strncpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
+                memcpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
                         tracerEffectNames[(int)Settings::TracerEffects::effect],
                         strlen(localWeapon->GetCSWpnData()->GetTracerEffect()));
             }
             else
             {
-                strncpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
+                memcpy(localWeapon->GetCSWpnData()->GetTracerEffect(),
                         tracerEffectNames[(int)Settings::TracerEffects::effect],
                         strlen(tracerEffectNames[(int)Settings::TracerEffects::effect]));
             }

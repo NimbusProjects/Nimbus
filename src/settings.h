@@ -13,6 +13,15 @@
 #include "SDK/definitions.h"
 #include "SDK/Materialsystem_config.h"
 
+
+enum class ResolverType : int
+{
+	Type1,
+	Type2,
+	pResolver,
+	Type3,
+};
+
 enum class DrawingBackend : int {
     SURFACE = 0,
     IMGUI,
@@ -86,6 +95,7 @@ enum class Sound : int {
 	MEME,
 	ERROR,
 	ORCHESTRAL,
+	GAMESENSE,
 
 };
 
@@ -130,6 +140,7 @@ enum class SmokeType : int
 	NONE,
 };
 
+
 enum class AimbotType : int
 {
 	LEGIT,
@@ -151,13 +162,22 @@ enum class SpammerType : int
 	SPAMMER_POSITIONS,
 };
 
+enum class ShowedAngle : int
+{
+    REAL,
+    FAKE,
+    BOTH,
+};
+
 enum class AntiAimType: int
 {
 	RAGE,
 	LEGIT,
-	CUSTOM,
-	FREESTAND,
+  DUMP,
+  CUSTOM,
+  FREESTAND,
 };
+
 
 struct AimbotWeapon_t
 {
@@ -176,6 +196,7 @@ struct AimbotWeapon_t
 		 rcsEnabled,
 		 rcsAlwaysOn,
 		 spreadLimitEnabled,
+		 hitChanceEnabled,
 		 autoPistolEnabled,
 		 autoShootEnabled,
 		 autoScopeEnabled,
@@ -202,7 +223,9 @@ struct AimbotWeapon_t
 		  rcsAmountX = 2.0f,
 		  rcsAmountY = 2.0f,
 		  autoWallValue = 10.0f,
-		  spreadLimit = 1.0f;
+		  spreadLimit = 1.0f,
+		  HeadMultiPoint = 0.6f,
+		  hitChance = 80.0f;
 	bool desiredBones[31];
 
 	bool operator == (const AimbotWeapon_t& another) const
@@ -249,6 +272,9 @@ struct AimbotWeapon_t
 			this->flashCheck == another.flashCheck &&
 			this->spreadLimitEnabled == another.spreadLimitEnabled &&
 			this->spreadLimit == another.spreadLimit &&
+			this->HeadMultiPoint == another.HeadMultiPoint &&
+			this->hitChanceEnabled == another.hitChanceEnabled &&
+			this->hitChance == another.hitChance &&
 			this->autoWallEnabled == another.autoWallEnabled &&
 			this->autoWallValue == another.autoWallValue &&
 			this->autoSlow == another.autoSlow &&
@@ -257,6 +283,7 @@ struct AimbotWeapon_t
 			this->scopeControlEnabled == another.scopeControlEnabled;
 	}
 } const defaultSettings{};
+
 
 class ColorVar
 {
@@ -302,7 +329,6 @@ public:
 		return result;
 	}
 };
-
 namespace Settings
 {
 	namespace UI
@@ -382,13 +408,19 @@ namespace Settings
 	namespace Aimbot
 	{
 		extern bool enabled;
-		extern AimbotType type;
 		extern bool silent;
 		extern bool friendly;
 		extern Bone bone;
 		extern ButtonCode_t aimkey;
+    //extern curtarget;
+    extern AimbotType type;
 		extern bool aimkeyOnly;
-
+    extern int targetAimbot;
+    /*namespace Multipoint
+		{
+			extern float scale;
+		}
+    */
 		namespace Smooth
 		{
 			extern bool enabled;
@@ -412,6 +444,7 @@ namespace Settings
 		{
 			extern bool enabled;
 			extern float fov;
+      extern float HeadMultiPoint;
 			extern bool realDistance;
 			extern bool closestBone;
 			extern bool desiredBones[];
@@ -495,6 +528,12 @@ namespace Settings
 			extern float value;
 		}
 
+		namespace HitChance
+		{
+			extern bool enabled;
+			extern float value;
+		}
+
 		namespace Prediction
 		{
 			extern bool enabled;
@@ -536,19 +575,28 @@ namespace Settings
 		}
 	}
 
-    namespace AntiAim
-    {
+
+namespace AntiAim
+{
 		extern bool enabled;
 		extern AntiAimType type;
-		extern float yaw;
 
+
+		extern float yaw;
+    extern float off1;
+    extern float off2;
+    extern float roff1;
+    extern float roff2;
+    extern int fakeL;
+    extern int fakeR;
+    extern bool swap;
 		extern ButtonCode_t left;
 		extern ButtonCode_t right;
 
 		namespace AutoDisable
-        {
-            extern bool knifeHeld;
-        }
+    {
+        extern bool knifeHeld;
+    }
 
 		namespace States
 		{
@@ -560,13 +608,11 @@ namespace Settings
 				extern float angle;
 			} // namespace Stand
 
-			/*
 			namespace Walk
 			{
 				extern AntiAimType type;
 				extern float angle;
 			} // namespace Walk
-			*/
 
 			namespace Run
 			{
@@ -579,19 +625,35 @@ namespace Settings
 				extern AntiAimType type;
 				extern float angle;
 			} // namespace Air
-		}		
+		}
 
-        namespace LBYBreaker
-        {
-            extern bool enabled;
-			extern bool custom;
-            extern float offset;
-        }
+    namespace Desync
+    {
+      extern float amount;
+      extern float time;
+      extern float interval;
     }
 
-	namespace Resolver
+	namespace LBYBreaker
 	{
-		extern bool resolveAll;
+		extern bool enabled;
+		extern float offset;
+		extern bool manual;
+		extern float VelMax;
+		extern float NextUpdate;
+		extern float SwitchTick;
+    extern bool custom;
+		extern float CurTime;
+	}
+}
+
+    namespace Resolver
+    {
+	    extern bool resolveAll;
+      extern float x;
+	    extern float y;
+	    extern int RandMax;
+	    extern ResolverType type;
 	}
 
 	namespace ESP
@@ -676,6 +738,7 @@ namespace Settings
 			extern bool rescuing;
 			extern bool location;
 			extern bool money;
+			extern bool missedShots;
 		}
 
 		namespace Skeleton
@@ -735,6 +798,7 @@ namespace Settings
 			extern HealthColorVar enemyColor;
 			extern HealthColorVar enemyVisibleColor;
 			extern HealthColorVar localplayerColor;
+			extern HealthColorVar backtrackColor;
 			extern ChamsType type;
 
 			namespace Arms
@@ -752,6 +816,12 @@ namespace Settings
 			}
 		}
 
+
+    namespace ZeusRadius
+    {
+      extern bool enabled;
+			extern ColorVar ZeusColor;
+    }
 		namespace Sounds
 		{
 			extern bool enabled;
@@ -784,9 +854,10 @@ namespace Settings
 			extern float size;
 		}
 
-		namespace Backtrack
+		namespace backtrack
 		{
-			extern bool enabled;
+		  extern bool enabled;
+
 		}
 
 		namespace Spread
@@ -838,16 +909,23 @@ namespace Settings
 		extern bool enabled;
 		extern float radius;
 	}
-	
+
 	namespace Eventlog
 	{
 		extern bool showEnemies;
 		extern bool showTeammates;
-		extern bool showLocalplayer;		
+		extern bool showLocalplayer;
+		extern bool filterDamage;
+		extern bool filterPurchases;
+		extern bool filterBombsite;
+		extern bool filterDefuse;
+		extern bool filterPlant;
+		extern bool filterPickup;
+		extern bool filterDrop;
 		extern float duration;
-		extern float lines;		
+		extern float lines;
 		extern ColorVar color;
-	}	
+	}
 
 	namespace Spammer
 	{
@@ -903,16 +981,31 @@ namespace Settings
 		}
 	}
 
+  	namespace FakeWalk
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
+  	namespace FakeCrouch
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
+
 	namespace NoDuckCooldown
 	{
 		extern bool enabled;
 	}
-
+/*
 	namespace LagComp
 	{
-		extern bool enabled;
+	  extern bool enabled;
+	  extern int time;
+	  extern float fov;
 	}
-
+*/
 	namespace AutoStrafe
 	{
 		extern bool enabled;
@@ -925,6 +1018,7 @@ namespace Settings
 		extern bool enabled;
 		extern float value;
 	}
+
 
 	namespace FOVChanger
 	{
@@ -973,6 +1067,12 @@ namespace Settings
 		extern bool showOnlyWhenShooting;
 	}
 
+	namespace Airstuck
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
 	namespace Autoblock
 	{
 		extern bool enabled;
@@ -1015,6 +1115,12 @@ namespace Settings
 		extern ClanTagType type;
 	}
 
+	namespace FakeVote
+	{
+		extern char message[128];
+		extern char cmd[128];
+	}
+
 	namespace View
 	{
 		namespace NoAimPunch
@@ -1032,10 +1138,13 @@ namespace Settings
 	{
 		extern bool enabled;
 		extern int value;
+		extern int minTicks;
+		extern int maxTicks;
+		extern bool adaptive;
+    extern bool lagSpike;
+    extern bool bSend;
 
-		extern bool lagSpike;
-
-		namespace States
+    namespace States
 		{
 			extern bool enabled;
 
@@ -1056,6 +1165,24 @@ namespace Settings
 				extern bool enabled;
 				extern int value;
 			}
+		}
+	}
+
+	namespace FakeLatency
+  {
+    extern float value;
+  }
+
+	namespace BackTrack {
+		extern bool enabled;
+		extern int time;
+		extern float fov;
+		namespace Chams {
+			extern bool enabled;
+			extern bool drawlastonly;
+			extern ColorVar firstcolor;
+			extern ColorVar fadecolor;
+			extern float alpha;
 		}
 	}
 
@@ -1125,12 +1252,49 @@ namespace Settings
 	{
 		extern bool enabled;
 		extern float distance;
+        extern ShowedAngle type;
         extern ButtonCode_t key;
+	}
+
+	namespace JumpThrow
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
+	namespace ProfileChanger
+	{
+		extern int coinID;
+		extern int musicID;
+		extern int compRank;
+		extern int weaponStatus;
+		extern int weaponRarity;
 	}
 
 	namespace NoFall
 	{
 		extern bool enabled;
+	}
+
+	namespace SvCheats
+	{
+		extern bool enabled;
+
+  	  namespace gravity{
+        extern bool enabled;
+        extern int amount;
+    }
+
+    namespace viewmodel{
+        extern bool enabled;
+        extern float fov;
+        extern float x;
+        extern float y;
+        extern float z;
+    }
+
+
+
 	}
 
 	namespace DisablePostProcessing
@@ -1181,7 +1345,17 @@ namespace Settings
  			extern bool allies;
  		}
  	}
-	
+
+
+ 	namespace LogShots
+	{
+		extern bool enabled;
+	}
+
+	namespace AngleIndicator
+	{
+		extern bool enabled;
+	}
     namespace Debug
     {
         namespace AutoWall
@@ -1200,10 +1374,6 @@ namespace Settings
 			extern int modelID; // in econItemMap, not itemdefindex
 		}
 		namespace AnimLayers
-		{
-			extern bool draw;
-		}
-		namespace AntiAim
 		{
 			extern bool draw;
 		}

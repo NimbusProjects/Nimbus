@@ -132,6 +132,7 @@ public:
 	float x, y, z;
 	Vector(void);
 	Vector(float X, float Y, float Z);
+	inline float Angle(float x, float y, float z);
 	void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f);
 	bool IsValid() const;
 	float operator[](int i) const;

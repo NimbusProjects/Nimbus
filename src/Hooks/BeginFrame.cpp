@@ -3,7 +3,6 @@
 #include "../Utils/skins.h"
 #include "../interfaces.h"
 
-#include "../Hacks/clantagchanger.h"
 #include "../Hacks/namechanger.h"
 #include "../Hacks/namestealer.h"
 #include "../Hacks/spammer.h"

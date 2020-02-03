@@ -22,12 +22,13 @@ namespace Util
 	std::string WstringToString(std::wstring wstr);
 	std::wstring StringToWstring(std::string str);
 	ImColor GetRainbowColor(float speed);
+	//ImColor GetFade(float speed);
 	Color GetHealthColor(int hp);
 	Color GetHealthColor(C_BasePlayer* player);
 	int RandomInt(int min, int max);
 	long GetEpochTime();
 
-	template <typename T>
+template <typename T>
 	T GetValueByKey(std::vector<std::pair<int, T>> vec, int key)
 	{
 		for (auto i : vec)

@@ -52,6 +52,7 @@ extern VMT* launcherMgrVMT;
 extern VMT* engineVGuiVMT;
 extern VMT* soundVMT;
 extern VMT* uiEngineVMT;
+extern VMT* netChannelVMT;
 
 extern LineGoesThroughSmokeFn LineGoesThroughSmoke;
 extern InitKeyValuesFn InitKeyValues;
@@ -60,8 +61,8 @@ extern LoadFromBufferFn LoadFromBuffer;
 extern GetLocalClientFn GetLocalClient;
 
 //extern RandomSeedFn RandomSeed;
-//extern RandomFloatFn RandomFloat;
-//extern RandomFloatExpFn RandomFloatExp;
+//extern RandomFloatFn RandomFloatA;
+//extern RandomFloatExpFn RandomFloatExpA;
 //extern RandomIntFn RandomInt;
 //extern RandomGaussianFloatFn RandomGaussianFloat;
 

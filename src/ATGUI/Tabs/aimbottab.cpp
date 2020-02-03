@@ -51,6 +51,7 @@ static bool smokeCheck = false;
 static bool flashCheck = false;
 static bool spreadLimitEnabled = false;
 static float spreadLimit = 0.1f;
+static float HeadMultiPoint = 0.6f;
 static bool autoWallEnabled = false;
 static float autoWallValue = 10.0f;
 static bool autoAimRealDistance = false;
@@ -100,6 +101,7 @@ void UI::ReloadWeaponSettings()
 	flashCheck = Settings::Aimbot::weapons.at(index).flashCheck;
 	spreadLimitEnabled = Settings::Aimbot::weapons.at(index).spreadLimitEnabled;
 	spreadLimit = Settings::Aimbot::weapons.at(index).spreadLimit;
+	HeadMultiPoint = Settings::Aimbot::weapons.at(index).HeadMultiPoint;
 	autoWallEnabled = Settings::Aimbot::weapons.at(index).autoWallEnabled;
 	autoWallValue = Settings::Aimbot::weapons.at(index).autoWallValue;
 	autoAimRealDistance = Settings::Aimbot::weapons.at(index).autoAimRealDistance;
@@ -407,7 +409,7 @@ void Aimbot::RenderTab()
 				}
 			}
 		} break;
-		
+
 		default:
 			break;
 		}
@@ -607,6 +609,14 @@ void Aimbot::RenderTab()
 					UI::UpdateWeaponSettings();
 				if (ImGui::SliderFloat(XORSTR("##ERROR"), &errorMarginValue, 0, 2))
 					UI::UpdateWeaponSettings();
+
+        ImGui::Separator();
+
+        ImGui::Text("Head MultiPoint Scale");
+			  if( ImGui::SliderFloat(XORSTR("##HEADMULTIPOINT"), &HeadMultiPoint, 0, 1.0, "Head MPoint Scale %0.2f") )
+				UI::UpdateWeaponSettings();
+
+
 				ImGui::PopItemWidth();
 			}
 
@@ -625,6 +635,19 @@ void Aimbot::RenderTab()
 				UI::UpdateWeaponSettings();
 			if( ImGui::SliderFloat(XORSTR("##SPREADLIMIT"), &spreadLimit, 0, 0.1) )
 				UI::UpdateWeaponSettings();
+
+      ImGui::Separator();
+      ImGui::Text("Head MultiPoint Scale");
+			  if( ImGui::SliderFloat(XORSTR("##HEADMULTIPOINT"), &HeadMultiPoint, 0, 1.0, "Head MPoint Scale %0.2f") )
+				UI::UpdateWeaponSettings();
+
+
+      //Coming soon...
+			//if( ImGui::SliderFloat(XORSTR("##HITCHANCE"), &hitChance, 0, 100.0) )
+			//	UI::UpdateWeaponSettings();
+
+
+
 
 			ImGui::Columns(1);
 			ImGui::Separator();

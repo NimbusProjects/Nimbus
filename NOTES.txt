@@ -1,0 +1,25 @@
+You *can* tap skeet/ot if you configure this properly.
+Legit AA is pretty op btw. Careful changing settings on it though.
+
+-- Coming up next:
+  -> Better FakeDuck.
+  -> BackTrack Chams Fix.
+  -> FakeLatency.
+  -> FakeAngle + FakeLag chams(if that's even useful lmao).
+  -> Zeus/Knife Radius Crash Fix on join game.
+  -> Tweaks to Resolver. (even tho it already be hitting p LMAO)
+  -> Movement keys display.
+  -> A lot more stuff.
+  -> Some more thicc exploits.
+  -> FakeLag on FakeDuck.
+  -> Accuracy scope thing.
+  -> GodMODE!?!?! (OWO)
+  -> Viewmodel Aimbot.
+  -> This ye olde SmartAA concept i had awhile ago. (Something dealing with
+  switching angles after someone shoots to a random position OwO).
+
+-- Into the future.
+  -> Scripting language support.
+  -> Multi Directional Autostrafe.
+  -> Idk, a lot more.
+

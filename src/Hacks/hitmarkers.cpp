@@ -164,6 +164,9 @@ void Hitmarkers::FireGameEvent(IGameEvent* event)
 			case Sound::ORCHESTRAL:
 				engine->ClientCmd_Unrestricted( "playvol player\\orch_hit_csharp_short 0.8" );
 				break;
+			case Sound::GAMESENSE:
+				engine->ClientCmd_Unrestricted( "playvol buttons\\arena_switch_press_02" );
+				break;
 			default:
 				break;
 		}

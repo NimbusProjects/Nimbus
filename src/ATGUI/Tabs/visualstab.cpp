@@ -1,13 +1,12 @@
 #include "visualstab.h"
 
+
 #include "../../settings.h"
 #include "../../Utils/xorstring.h"
 #include "../../ImGUI/imgui_internal.h"
 #include "../atgui.h"
 #include "../../Hacks/tracereffect.h"
 #include "../../Hacks/materialconfig.h"
-
-#pragma GCC diagnostic ignored "-Wformat-security"
 
 void Visuals::RenderTab()
 {
@@ -22,7 +21,7 @@ void Visuals::RenderTab()
 	const char* ArmsTypes[] = { "Default", "Wireframe", "None" };
 	const char* WeaponTypes[] = { "Default", "Wireframe", "None" };
 	const char* SmokeTypes[] = { "Wireframe", "None" };
-    const char* Sounds[] = { "None", "SpongeBob", "Half life", "Half life 2", "Half life 3", "Half life 4", "BB Gun Bell", "Dopamine", "Wub", "Pedo Yes!", "Meme", "Error", "Orchestral" };
+    const char* Sounds[] = { "None", "SpongeBob", "Half life", "Half life 2", "Half life 3", "Half life 4", "BB Gun Bell", "Dopamine", "Wub", "Pedo Yes!", "Meme", "Error", "Orchestral", "GameSense" };
 	const char* SkyBoxes[] = {
 			"cs_baggage_skybox_", // 0
 			"cs_tibet",
@@ -102,7 +101,12 @@ void Visuals::RenderTab()
 				ImGui::ItemSize(ImVec2(0.0f, 0.0f), 0.0f);
 				ImGui::Checkbox(XORSTR("Bullet Tracers"), &Settings::ESP::BulletTracers::enabled);
 				ImGui::Checkbox(XORSTR("Head Dot"), &Settings::ESP::HeadDot::enabled);
-				ImGui::Checkbox(XORSTR("Backtrack"), &Settings::ESP::Backtrack::enabled);
+				//ImGui::Checkbox(XORSTR("backtrack"), &Settings::ESP::backtrack::enabled);
+
+				//ImGui::SliderFloat(XORSTR("##NASATRACKALPHA"), &Settings::BackTrack::Chams::alpha, 0.f, 1.f, XORSTR("BackTrack Alpha: %0.2f"));
+
+
+
 			}
 			ImGui::NextColumn();
 			{
@@ -220,6 +224,23 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Show Enemies"), &Settings::Eventlog::showEnemies);
 				ImGui::Checkbox(XORSTR("Show Allies"), &Settings::Eventlog::showTeammates);
 
+				if(ImGui::Button(XORSTR("Filter"), ImVec2(-1, 0)))
+					ImGui::OpenPopup(XORSTR("##EventlogFilterWindow"));
+				ImGui::SetNextWindowSize(ImVec2(160,210), ImGuiSetCond_Always);
+				if( ImGui::BeginPopup(XORSTR("##EventlogFilterWindow")) )
+				{
+					ImGui::PushItemWidth(-1);
+					ImGui::Checkbox(XORSTR("Damage"), &Settings::Eventlog::filterDamage);
+                    ImGui::Checkbox(XORSTR("Purchases"), &Settings::Eventlog::filterPurchases);
+					ImGui::Checkbox(XORSTR("Enter bombsite"), &Settings::Eventlog::filterBombsite);
+					ImGui::Checkbox(XORSTR("Defuse"), &Settings::Eventlog::filterDefuse);
+					ImGui::Checkbox(XORSTR("Plant"), &Settings::Eventlog::filterPlant);
+					ImGui::Checkbox(XORSTR("Pickup"), &Settings::Eventlog::filterPickup);
+					ImGui::Checkbox(XORSTR("Drop"), &Settings::Eventlog::filterDrop);
+					ImGui::PopItemWidth();
+					ImGui::EndPopup();
+				}
+
 			}
 			ImGui::NextColumn();
 			{
@@ -272,6 +293,7 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("No Flash"), &Settings::Noflash::enabled);
 				ImGui::Checkbox(XORSTR("No Smoke"), &Settings::NoSmoke::enabled);
 				ImGui::Checkbox(XORSTR("Show Footsteps"), &Settings::ESP::Sounds::enabled);
+				ImGui::Checkbox(XORSTR("Show Zeus/Knife Radius"), &Settings::ESP::ZeusRadius::enabled);
 				ImGui::Checkbox(XORSTR("No View Punch"), &Settings::View::NoViewPunch::enabled);
 				ImGui::Checkbox(XORSTR("No Sky"), &Settings::NoSky::enabled);
 
@@ -460,10 +482,10 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Autowall Debug"), &Settings::Debug::AutoWall::debugView);
 				ImGui::Checkbox(XORSTR("AimSpot Debug"), &Settings::Debug::AutoAim::drawTarget);
 				ImGui::Checkbox(XORSTR("BoneMap Debug"), &Settings::Debug::BoneMap::draw);
-				ImGui::Checkbox(XORSTR("AntiAim Debug"), &Settings::Debug::AntiAim::draw);
+				ImGui::Checkbox(XORSTR("Log Shots"), &Settings::LogShots::enabled);
 				if( Settings::Debug::BoneMap::draw )
 					ImGui::Checkbox(XORSTR("Just Dots"), &Settings::Debug::BoneMap::justDrawDots);
-				ImGui::SliderInt(XORSTR("Test Model ID"), &Settings::Debug::BoneMap::modelID, 1253, 1350, XORSTR("Model ID: %0.f") );
+         ImGui::SliderInt(XORSTR("Test Model ID"), &Settings::Debug::BoneMap::modelID, 1253, 1350, XORSTR("Model ID: %0.f") );
 			}
 			ImGui::Columns(1);
 			ImGui::Separator();

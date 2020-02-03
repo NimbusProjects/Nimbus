@@ -13,7 +13,8 @@
 #include "../Hacks/hitmarkers.h"
 #include "../Hacks/eventlog.h"
 #include "../Hacks/snipercrosshair.h"
-
+#include "../Hacks/angleindicator.h"
+#include "../Hacks/logshots.h"
 #include <mutex>
 
 extern StartDrawingFn StartDrawing;
@@ -49,7 +50,9 @@ void Hooks::Paint(void* thisptr, PaintMode_t mode)
         Recoilcrosshair::Paint();
         Hitmarkers::Paint();
         Eventlog::Paint();
+        AngleIndicator::Paint();
         GrenadePrediction::Paint();
+	LogShots::Paint();
 
         if( Settings::ESP::backend == DrawingBackend::SURFACE ){
             StartDrawing(surface);

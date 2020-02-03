@@ -7,18 +7,16 @@
 #include "../../Hacks/skinchanger.h"
 #include "../imgui.h"
 
-#pragma GCC diagnostic ignored "-Wformat-security"
-
 void Models::RenderTab()
 {
 	static int originalModelCT = (int) ItemDefinitionIndex::WEAPON_KNIFE;
 	static int replacementModelCT = Settings::Skinchanger::skinsCT.find((ItemDefinitionIndex) originalModelCT) != Settings::Skinchanger::skinsCT.end() ? (int) Settings::Skinchanger::skinsCT.at((ItemDefinitionIndex)originalModelCT).itemDefinitionIndex : (int) ItemDefinitionIndex::WEAPON_KNIFE;
-	static char filterOriginalModelsCT[18];
-	static char filterReplacementModelsCT[18];
+	static char filterOriginalModelsCT[19];
+	static char filterReplacementModelsCT[19];
 	static int originalModelT = (int) ItemDefinitionIndex::WEAPON_KNIFE_T;
 	static int replacementModelT = Settings::Skinchanger::skinsT.find((ItemDefinitionIndex) originalModelT) != Settings::Skinchanger::skinsT.end() ? (int) Settings::Skinchanger::skinsT.at((ItemDefinitionIndex)originalModelT).itemDefinitionIndex : (int) ItemDefinitionIndex::WEAPON_KNIFE_T;
-	static char filterOriginalModelsT[18];
-	static char filterReplacementModelsT[18];
+	static char filterOriginalModelsT[19];
+	static char filterReplacementModelsT[19];
 
 	ImGui::Checkbox(XORSTR("Enabled"), &Settings::Skinchanger::Models::enabled);
 	ImGui::Separator();

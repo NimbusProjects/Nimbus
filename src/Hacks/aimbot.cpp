@@ -9,6 +9,7 @@
 #include "../Utils/bonemaps.h"
 #include "../settings.h"
 #include "../interfaces.h"
+#include "../Hooks/hooks.h"
 
 
 // Default aimbot settings
@@ -26,6 +27,7 @@ bool Settings::Aimbot::ErrorMargin::enabled = false;
 float Settings::Aimbot::ErrorMargin::value = 0.0f;
 bool Settings::Aimbot::AutoAim::enabled = false;
 float Settings::Aimbot::AutoAim::fov = 180.0f;
+float Settings::Aimbot::AutoAim::HeadMultiPoint = 0.6f;
 bool Settings::Aimbot::AutoAim::realDistance = false;
 bool Settings::Aimbot::AutoAim::closestBone = false;
 bool Settings::Aimbot::AutoAim::desiredBones[] = {true, true, true, true, true, true, true, // center mass
@@ -111,7 +113,7 @@ static bool HeadMultiPoint(C_BasePlayer *player, Vector points[])
 	Math::VectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
 	Math::VectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
 
-	Vector center = ( mins + maxs ) * 0.5f;
+	Vector center = ( mins + maxs ) * Settings::Aimbot::AutoAim::HeadMultiPoint;
 	// 0 - center, 1 - forehead, 2 - skullcap, 3 - upperleftear, 4 - upperrightear, 5 - uppernose, 6 - upperbackofhead
 	// 7 - leftear, 8 - rightear, 9 - nose, 10 - backofhead
 	for( int i = 0; i < headVectors; i++ ) // set all points initially to center mass of head.
@@ -459,12 +461,15 @@ static void RCS(QAngle& angle, C_BasePlayer* player, CUserCmd* cmd)
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
 	QAngle CurrentPunch = *localplayer->GetAimPunchAngle();
 
+  if(Settings::Aimbot::silent) //Testing this too.
+    cmd->viewangles = angle;
+
 	if ( Settings::Aimbot::silent || hasTarget )
 	{
 		angle.x -= CurrentPunch.x * valueX;
 		angle.y -= CurrentPunch.y * valueY;
 	}
-	else if (localplayer->GetShotsFired() > 1)
+	else if (localplayer->GetShotsFired() > 1) //Testing...
 	{
 		QAngle NewPunch = { CurrentPunch.x - RCSLastPunch.x, CurrentPunch.y - RCSLastPunch.y, 0 };
 
@@ -570,7 +575,7 @@ static void Smooth(C_BasePlayer* player, QAngle& angle)
 
 	angle = viewAngles + toChange;
 }
-
+/*
 static void Backtrack(C_BasePlayer* localplayer, C_BasePlayer* player, CUserCmd* cmd)
 {
 	// TODO: Implement a way for the aimbot to shoot backtrack.
@@ -593,6 +598,7 @@ static void Backtrack(C_BasePlayer* localplayer, C_BasePlayer* player, CUserCmd*
 		}
 	}
 }
+*/
 
 static void AutoCrouch(C_BasePlayer* player, CUserCmd* cmd)
 {
@@ -611,17 +617,19 @@ static void LagSpike(C_BasePlayer* player, CUserCmd* cmd)
 		return;
 
 	if (!player)
-	{
-		FakeLag::lagSpike = false;
+  {
+    FakeLag::lagSpike = false;
 		return;
-	}
+  }
 
 	FakeLag::lagSpike = true;
 }
 
+/*
 static void AutoSlow(C_BasePlayer* player, float& forward, float& sideMove, float& bestDamage, C_BaseCombatWeapon* active_weapon, CUserCmd* cmd)
 {
 
+  static int choked = 0;
 	if (!Settings::Aimbot::AutoSlow::enabled){
 		Settings::Aimbot::AutoSlow::goingToSlow = false;
 		return;
@@ -641,29 +649,82 @@ static void AutoSlow(C_BasePlayer* player, float& forward, float& sideMove, floa
 
 	Settings::Aimbot::AutoSlow::goingToSlow = true;
 
-	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+	auto* localplayer = dynamic_cast<C_BasePlayer*>(entityList->GetClientEntity(engine->GetLocalPlayer()));
 
-	C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*) entityList->GetClientEntityFromHandle(localplayer->GetActiveWeapon());
+	auto* activeWeapon = dynamic_cast<C_BaseCombatWeapon*> (entityList->GetClientEntityFromHandle(localplayer->GetActiveWeapon()));
 	if (!activeWeapon || activeWeapon->GetAmmo() == 0)
 		return;
-
 	if( Settings::Aimbot::SpreadLimit::enabled )
 	{
 		if( (activeWeapon->GetSpread() + activeWeapon->GetInaccuracy()) > Settings::Aimbot::SpreadLimit::value )
 		{
+			cmd->buttons |= IN_CANCEL;
 			cmd->buttons |= IN_WALK;
-			forward = -forward;
-			sideMove = -sideMove;
+			forward = 0;
+			sideMove = 0;
 			cmd->upmove = 0;
+      choked = choked > 1 ? 0 : choked + 1;
+      cmd->forwardmove = choked < 1 || choked > 1 ? 0 : cmd->forwardmove;
+      cmd->sidemove = choked < 1 || choked > 1 ? 0 : cmd->sidemove;
+      CreateMove::sendPacket2 = choked < 1;
+      CreateMove::sendPacket2 = false;
 		}
 	}
 	else if( localplayer->GetVelocity().Length() > (activeWeapon->GetCSWpnData()->GetMaxPlayerSpeed() / 3) ) // https://youtu.be/ZgjYxBRuagA
 	{
-		cmd->buttons |= IN_WALK;
-		forward = -forward;
-		sideMove = -sideMove;
-		cmd->upmove = 0;
+  		cmd->buttons |= IN_CANCEL;
+			cmd->buttons |= IN_WALK;
+			forward = 0;
+			sideMove = 0;
+			cmd->upmove = 0;
+      choked = choked > 1 ? 0 : choked + 1;
+      cmd->forwardmove = choked < 1 || choked > 1 ? 0 : cmd->forwardmove;
+      cmd->sidemove = choked < 1 || choked > 1 ? 0 : cmd->sidemove;
+      CreateMove::sendPacket2 = choked < 1;
+      CreateMove::sendPacket2 = false;
 	}
+}
+*/
+
+
+static void AutoSlow(C_BasePlayer* player, Vector& spot, float& forwardMove, float& sideMove, C_BaseCombatWeapon* active_weapon, CUserCmd* cmd)
+{
+    if (!Settings::Aimbot::AutoSlow::enabled)
+        return;
+
+    if (!player)
+        return;
+
+    float nextPrimaryAttack = active_weapon->GetNextPrimaryAttack();
+
+    if (nextPrimaryAttack > globalVars->curtime)
+        return;
+
+    C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+
+    C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*) entityList->GetClientEntityFromHandle(localplayer->GetActiveWeapon());
+    if (!activeWeapon || activeWeapon->GetAmmo() == 0)
+        return;
+
+
+
+    Vector unpredVel;
+    Vector velocity = unpredVel;
+    float speed = localplayer->GetVelocity().Length();
+
+    QAngle direction;
+    Math::VectorAngles(velocity, direction);
+
+    Vector forward;
+    Math::AngleVectors(direction, forward);
+
+    auto negated_direction = forward * -speed;
+
+    float factor = std::max(negated_direction.x, negated_direction.y) / 450.f;
+    negated_direction *= factor;
+
+    forwardMove = negated_direction.x;
+    sideMove = negated_direction.y;
 }
 
 static void AutoCock(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CUserCmd* cmd)
@@ -684,9 +745,9 @@ static void AutoCock(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CUs
 
     cmd->buttons |= IN_ATTACK;
     float postponeFireReadyTime = activeWeapon->GetPostPoneReadyTime();
-    if (postponeFireReadyTime > 0)
+    if (postponeFireReadyTime-20 > 0)
     {
-        if (postponeFireReadyTime < globalVars->curtime)
+        if (postponeFireReadyTime-5 < globalVars->curtime)
         {
             if (player)
                 return;
@@ -872,10 +933,11 @@ void Aimbot::CreateMove(CUserCmd* cmd)
     }
 
     AimStep(player, angle, cmd);
-	Backtrack(localplayer, player, cmd);
+	//Backtrack(localplayer, player, cmd);
 	AutoCrouch(player, cmd);
-	LagSpike(player, cmd);
-	AutoSlow(player, oldForward, oldSideMove, bestDamage, activeWeapon, cmd);
+  LagSpike(player, cmd);
+	//AutoSlow(player, oldForward, oldSideMove, bestDamage, activeWeapon, cmd);
+  AutoSlow(player, bestSpot, oldForward, oldSideMove, activeWeapon, cmd);
 	AutoPistol(activeWeapon, cmd);
 	AutoShoot(player, activeWeapon, cmd);
 	AutoCock(player, activeWeapon, cmd);
@@ -968,6 +1030,7 @@ void Aimbot::UpdateValues()
 	Settings::Aimbot::FlashCheck::enabled = currentWeaponSetting.flashCheck;
 	Settings::Aimbot::SpreadLimit::enabled = currentWeaponSetting.spreadLimitEnabled;
 	Settings::Aimbot::SpreadLimit::value = currentWeaponSetting.spreadLimit;
+	Settings::Aimbot::AutoAim::HeadMultiPoint = currentWeaponSetting.HeadMultiPoint;
 	Settings::Aimbot::AutoWall::enabled = currentWeaponSetting.autoWallEnabled;
 	Settings::Aimbot::AutoWall::value = currentWeaponSetting.autoWallValue;
 	Settings::Aimbot::AutoSlow::enabled = currentWeaponSetting.autoSlow;

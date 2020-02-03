@@ -28,7 +28,7 @@ void EventListener::FireGameEvent(IGameEvent* event)
     Hitmarkers::FireGameEvent(event);
     Eventlog::FireGameEvent(event);
     NameStealer::FireGameEvent(event);
-    Resolver::FireGameEvent(event);
+    //Resolver::FireGameEvent(event);
     Spammer::FireGameEvent(event);
     ValveDSCheck::FireGameEvent(event);
     SkinChanger::FireGameEvent(event);

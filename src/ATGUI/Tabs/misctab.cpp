@@ -17,8 +17,8 @@
 #include "../../Hacks/grenadehelper.h"
 #include "../../Hacks/clantagchanger.h"
 #include "../../Hacks/valvedscheck.h"
-
-#pragma GCC diagnostic ignored "-Wformat-security"
+#include "../../Hacks/fakevote.h"
+#include "../../Hacks/profilechanger.h"
 
 static char nickname[127] = "";
 
@@ -30,7 +30,7 @@ void Misc::RenderTab()
 	const char* teams[] = { "Allies", "Enemies", "Both" };
 	const char* grenadeTypes[] = { "FLASH", "SMOKE", "MOLOTOV", "HEGRENADE" };
 	const char* throwTypes[] = { "NORMAL", "RUN", "JUMP", "WALK" };
-	const char* angleTypes[] = { "Real", "Fake" };
+	const char* angleTypes[] = { "Real", "Fake", "Both" };
 
 	ImGui::Columns(2, nullptr, true);
 	{
@@ -208,15 +208,34 @@ void Misc::RenderTab()
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, true);
 			{
+
+				ImGui::Checkbox(XORSTR("Bypass SvCheats?"), &Settings::SvCheats::enabled);
+        if(Settings::SvCheats::enabled){
+				  ImGui::Checkbox(XORSTR("Control Gravity?"), &Settings::SvCheats::gravity::enabled);
+				  ImGui::Checkbox(XORSTR("Viewmodel Memes?"), &Settings::SvCheats::viewmodel::enabled);
+        }
+				//ImGui::Checkbox(XORSTR("Viewmodel FOV"), &Settings::FOVChanger::viewmodelEnabled);
 				ImGui::Checkbox(XORSTR("FOV"), &Settings::FOVChanger::enabled);
-				ImGui::Checkbox(XORSTR("Viewmodel FOV"), &Settings::FOVChanger::viewmodelEnabled);
 				ImGui::Checkbox(XORSTR("Ignore Scope"), &Settings::FOVChanger::ignoreScope);
 			}
 			ImGui::NextColumn();
 			{
 				ImGui::PushItemWidth(-1);
-				ImGui::SliderFloat(XORSTR("##FOVAMOUNT"), &Settings::FOVChanger::value, 0, 180);
-				ImGui::SliderFloat(XORSTR("##MODELFOVAMOUNT"), &Settings::FOVChanger::viewmodelValue, 0, 360);
+				ImGui::SliderFloat(XORSTR("##FOVAMOUNT"), &Settings::FOVChanger::value, 0, 180, "FOV: %.3f");
+				//ImGui::SliderFloat(XORSTR("##MODELFOVAMOUNT"), &Settings::FOVChanger::viewmodelValue, 0, 360);
+
+        if(Settings::SvCheats::gravity::enabled){
+				ImGui::SliderInt(XORSTR("##GRAVITY"), &Settings::SvCheats::gravity::amount, -3200, 3200, "RDOLLGRAVITY: %.3f");
+        }
+
+        if(Settings::SvCheats::viewmodel::enabled){
+				ImGui::SliderFloat(XORSTR("##VIEWMODELFOV"), &Settings::SvCheats::viewmodel::fov, -240, 240, "VIEWFOV: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELX"), &Settings::SvCheats::viewmodel::x, -30, 30, "VIEWX: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELY"), &Settings::SvCheats::viewmodel::y, -30, 30, "VIEWY: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELZ"), &Settings::SvCheats::viewmodel::z, -30, 30, "VIEWZ: %.3f");
+        }
+
+
 				ImGui::PopItemWidth();
 			}
 			ImGui::Columns(1);
@@ -232,8 +251,9 @@ void Misc::RenderTab()
 			{
 				ImGui::PushItemWidth(-1);
 				ImGui::SliderFloat(XORSTR("##TPCAMOFFSET"), &Settings::ThirdPerson::distance, 0.f, 500.f, XORSTR("Camera Offset: %0.f"));
+               // ImGui::Combo(XORSTR("Showed Angle"), (int*)& Settings::ThirdPerson::type, angleTypes, IM_ARRAYSIZE(angleTypes));
 				ImGui::PopItemWidth();
-                UI::KeyBindButton(&Settings::ThirdPerson::key);
+				UI::KeyBindButton(&Settings::ThirdPerson::key);
 			}
 			ImGui::Columns(1);
 			ImGui::Separator();
@@ -367,7 +387,7 @@ void Misc::RenderTab()
 				ImGui::PushItemWidth(-1);
 				if (ImGui::Combo(XORSTR("##ANIMATIONTYPE"), (int*)& Settings::ClanTagChanger::type, animationTypes, IM_ARRAYSIZE(animationTypes)))
 					ClanTagChanger::UpdateClanTagCallback();
-				if (ImGui::SliderInt(XORSTR("##ANIMATIONSPEED"), &Settings::ClanTagChanger::animationSpeed, 500, 2000))
+				if (ImGui::SliderInt(XORSTR("##ANIMATIONSPEED"), &Settings::ClanTagChanger::animationSpeed, 0, 2000))
 					ClanTagChanger::UpdateClanTagCallback();
 				ImGui::PopItemWidth();
 			}
@@ -383,7 +403,7 @@ void Misc::RenderTab()
 				NameChanger::SetName(std::string(nickname).c_str());
 
 			if (ImGui::Button(XORSTR("Glitch Name")))
-				NameChanger::SetName("\n\xAD\xAD\xAD");
+				NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
 			ImGui::SameLine();
 			if (ImGui::Button(XORSTR("No Name")))
 			{
@@ -423,26 +443,67 @@ void Misc::RenderTab()
 
 			ImGui::Columns(1);
 			ImGui::Separator();
+			ImGui::Text(XORSTR("FakeVote"));
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, true);
+			{
+				ImGui::Text(XORSTR("Message"));
+				if (ImGui::Button(XORSTR("Call Vote"), ImVec2(-1, 0)))
+					FakeVote::CallVote(1, 0);
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::PushItemWidth(-1);
+				ImGui::InputText(XORSTR("##FAKEVOTEMSG"), Settings::FakeVote::message, 128);
+				ImGui::InputText(XORSTR("##FAKEVOTECMD"), Settings::FakeVote::cmd, 128);
+				ImGui::PopItemWidth();
+			}
+			ImGui::Columns(1);
+			ImGui::Separator();
 			ImGui::Text(XORSTR("Other"));
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, true);
 			{
+				ImGui::Checkbox(XORSTR("Fake Lag"), &Settings::FakeLag::enabled);
+				ImGui::Checkbox(XORSTR("Adaptive Fake Lag"), &Settings::FakeLag::adaptive);
 				ImGui::Checkbox(XORSTR("Auto Accept"), &Settings::AutoAccept::enabled);
+				ImGui::Checkbox(XORSTR("AirStuck"), &Settings::Airstuck::enabled);
 				ImGui::Checkbox(XORSTR("Autoblock"), &Settings::Autoblock::enabled);
+				ImGui::Checkbox(XORSTR("Jump Throw"), &Settings::JumpThrow::enabled);
 				ImGui::Checkbox(XORSTR("Auto Defuse"), &Settings::AutoDefuse::enabled);
 				ImGui::Checkbox(XORSTR("Sniper Crosshair"), &Settings::SniperCrosshair::enabled);
 				ImGui::Checkbox(XORSTR("Disable post-processing"), &Settings::DisablePostProcessing::enabled);
 				ImGui::Checkbox(XORSTR("No Duck Cooldown"), &Settings::NoDuckCooldown::enabled);
-				ImGui::Checkbox(XORSTR("Backtrack"), &Settings::LagComp::enabled);
+				UI::KeyBindButton(&Settings::FakeCrouch::key);
+				ImGui::Checkbox(XORSTR("Fake Crouch"), &Settings::FakeCrouch::enabled);
 			}
 			ImGui::NextColumn();
 			{
+				ImGui::PushItemWidth(-1);
+
+				ImGui::PopItemWidth();
 				ImGui::Checkbox(XORSTR("Show Ranks"), &Settings::ShowRanks::enabled);
 				ImGui::Checkbox(XORSTR("Screenshot Cleaner"), &Settings::ScreenshotCleaner::enabled);
+				UI::KeyBindButton(&Settings::Airstuck::key);
 				UI::KeyBindButton(&Settings::Autoblock::key);
+				UI::KeyBindButton(&Settings::JumpThrow::key);
 				ImGui::Checkbox(XORSTR("Silent Defuse"), &Settings::AutoDefuse::silent);
 				ImGui::Checkbox(XORSTR("Attempt NoFall"), &Settings::NoFall::enabled);
-				ImGui::Checkbox(XORSTR("Auto Crouch"), &Settings::Aimbot::AutoCrouch::enabled);
+				UI::KeyBindButton(&Settings::FakeWalk::key);
+				ImGui::Checkbox(XORSTR("Fake Walk"), &Settings::FakeWalk::enabled);
+			}
+			ImGui::Columns(1);
+			ImGui::Separator();
+
+			ImGui::Text(XORSTR("Profile Changer"));
+			ImGui::Separator();
+			ImGui::Columns(1, nullptr, true);
+			{
+				ImGui::InputInt(XORSTR("COIN##ID"), &Settings::ProfileChanger::coinID);
+				ImGui::InputInt(XORSTR("MUSIC KIT##ID"), &Settings::ProfileChanger::musicID);
+				ImGui::InputInt(XORSTR("COMP RANK##ID"), &Settings::ProfileChanger::compRank);
+				if (ImGui::Button(XORSTR("Update profile"), ImVec2(-1, 0)))
+					ProfileChanger::UpdateProfile();
 			}
 			ImGui::Columns(1);
 			ImGui::Separator();

@@ -54,10 +54,10 @@ void AutoDefuse::CreateMove(CUserCmd *cmd)
 	else
 	if (Settings::AutoDefuse::enabled)
 	{	
-		if (localplayer->HasDefuser() && bombTimer > 5.039f)
+		if (localplayer->HasDefuser() && bombTimer > 5.5f)
 			return;
 
-		if (!localplayer->HasDefuser() && bombTimer > 10.039f)
+		if (!localplayer->HasDefuser() && bombTimer > 10.5f)
 			return;
 
 		float distance = localplayer->GetVecOrigin().DistTo(bomb->GetVecOrigin());

@@ -263,7 +263,6 @@ namespace Util
 				return false;
 			}
 		}
-
 		bool IsShotgun(ItemDefinitionIndex index)
 		{
 			switch (index)
@@ -272,7 +271,7 @@ namespace Util
 			case ItemDefinitionIndex::WEAPON_MAG7:
 			case ItemDefinitionIndex::WEAPON_SAWEDOFF:
 			case ItemDefinitionIndex::WEAPON_XM1014:
-				return true;		
+				return true;
 			default:
 				return false;
 			}
@@ -289,7 +288,7 @@ namespace Util
 			case ItemDefinitionIndex::WEAPON_MP7:
 			case ItemDefinitionIndex::WEAPON_MP9:
 			case ItemDefinitionIndex::WEAPON_UMP45:
-				return true;		
+				return true;
 			default:
 				return false;
 			}
@@ -304,7 +303,7 @@ namespace Util
 			case ItemDefinitionIndex::WEAPON_FAMAS:
 			case ItemDefinitionIndex::WEAPON_M4A1:
 			case ItemDefinitionIndex::WEAPON_M4A1_SILENCER:
-				return true;		
+				return true;
 			default:
 				return false;
 			}

@@ -8,6 +8,8 @@
 
 #include "../Utils/recvproxyhook.h"
 
+extern GetLocalClientFn GetLocalClient;
+
 extern std::unordered_map<std::string, std::string> killIcons;
 
 namespace SkinChanger

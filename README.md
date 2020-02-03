@@ -1,77 +1,26 @@
-# This is a public fork of Fuzion, since this is a public cheat, use it on your own risk!
+<p align="center">
+<img src="http://i.imgur.com/mCtrbIN.png">
+</p>
+===================
+
+# It looks like we are starting to get detected. Use public forks at your own Risk!
+# Build your own version to prevent detection PLEASE!
 
 [![Join the chat at https://gitter.im/Aimtux-Fuzion/Lobby](https://img.shields.io/gitter/room/TechnologyAdvice/Stardust.svg?style=flat-square)](https://gitter.im/Aimtux-Fuzion/Lobby#)
 
-# This is a public self-maintained Fuzion fork.
 Want to chat or play with other Fuzion users? Join us on Gitter!
-
-# Changelog
-Version 1.2.0 (Feb 1)
-- Updated menus
-- Updated fake-lag
-
-Version 1.1.2 (Jan 30)
-- Fake-lag moved to HvH tab
-- Move state fake-lag added (beta)
-- Put all anti-aim settings to "rage" by default
-- Adjusted HvH tab
-- Fixed fake-lag on peek
-
-Version 1.1.1 (Jan 28)
-- New menu design (beta)
-- New aimbot tab (beta)
-- New HvH tab
-- Removed resolver from HvH tab (available on player selection)
-- Auto crouch added to misc tab
-- Fake-lag on peek added
-
-Version 1.1.0 (Jan 25)
-- Third-person key added
-- Third-person optimization
-- Added Anti-Aim debug
-- Backtrack optimization
-- Misc features updated
-- Removed angle-indicator (because of anti-aim debug this is useless)
-- LBY breaker optimization
-- Move-state anti-aim added
-
-Version 1.0.2 (Jan 25)
-- Adjusted auto-defuser
-- Adjusted backtrack
-- Removed anti-aim debug duplicate in menus
-- Added key save for third-person
-
-Version 1.0.1 (Jan 16)
-- Added player move-state based anti-aim
-- Thirdperson angle is now last-tick viewangle
-- Automatic LBY breaker values (customs are still available)
-- Added disable anti-aim on knife-held back
-- Changed default third-person value from 30 to 150
-- Removed angle-indicator
-
-Version 1.0.0 (Jan 15)
-- Added new anti-aim
-- Anti-aim angle keys
-- New pretty bullet tracer
-- Removed air-stuck
-- Removed jump-throw
-- Added backtrack
-- Fake-lag optimization (No fake-lag while standing still)
 
 
 ## What is Fuzion?
 
 A fully featured internal hack for *CounterStrike : Global Offensive* written in C++.
 
-## What is Zedeware?
-
-It is a fork of Fuzion, keeping the style and mentality. The difference being is the added/optimized features.
 
 ## Compiling
 
 **Note:** _Do NOT download or compile as the root user._
 
-#### Download the dependencies required to build Fuzion/Zedeware:
+#### Download the dependencies required to build Fuzion:
 
 If you are having problems compiling make sure you've got the latest version of `g++`.
 
@@ -94,14 +43,14 @@ sudo dnf install cmake gcc-c++ gdb git libstdc++-static mesa-libGL-devel SDL2-de
 
 ===================
 
-#### Download Zedeware:
+#### Download Fuzion:
 
 ```bash
-git clone --recursive https://github.com/Zedespook/zedeware
+git clone --recursive https://github.com/BellBush/Fuzion-1
 ```
 
 ```bash
-cd zedeware
+cd Fuzion
 ```
 
 ===================
@@ -113,7 +62,7 @@ You can build easily with the included build script.
 ./build
 ```
 
-You can later update with 
+You can later update with
 ```bash
 ./update
 ```
@@ -121,11 +70,11 @@ You can later update with
 
 ## Injecting using the load script
 
-First of all, make sure CS:GO is open, it does not matter whether you are in game or not. However, it is not recommended to inject while CS:GO is loading into a map. 
+First of all, make sure CS:GO is open, it does not matter whether you are in game or not. However, it is not recommended to inject while CS:GO is loading into a map.
 
 Navigate to the directory where Fuzion was built if you have not ready.
 ```bash
-cd zedeware
+cd Fuzion
 ```
 
 Now, you can inject the hack with the `load` script
@@ -135,7 +84,7 @@ Now, you can inject the hack with the `load` script
 
 You might be prompted to enter in your password, this is because the injection script requires root access.
 
-The text printed out during injection is not important. 
+The text printed out during injection is not important.
 
 If the injection was successful you will see a message at the bottom saying `Successfully injected!`, however, if the message says `Injection failed`, then you've most likely done something wrong.
 
@@ -143,7 +92,7 @@ Now, go back into CS:GO, if you are in the main menu of the game you should see 
 
 ![this](http://i.imgur.com/Gb0SV1u.png)
 
-*Note:* if you are getting crashes ( that are unrelated to game updates ) Try disabling shader precaching in your Steam Client -> Steam -> Settings -> Shader Pre-Caching. 
+*Note:* if you are getting crashes ( that are unrelated to game updates ) Try disabling shader precaching in your Steam Client -> Steam -> Settings -> Shader Pre-Caching.
 
 ## Using the hack
 
@@ -160,14 +109,13 @@ If you wish to unload the hack from the game, you can do so by entering the comm
 ```
 
 ## Configs
-# Your Fuzion configs can still be used on this cheat as well.
 
-Configs are stored in a hidden directory in your home folder. Specifically 
+Configs are stored in a hidden directory in your home folder. Specifically
 ```
 ~/.config/Fuzion
 ```
 
-Each `config.json` is stored in a seperately named folder (The name you see in-game, in the config window). 
+Each `config.json` is stored in a seperately named folder (The name you see in-game, in the config window).
 
 To add a config, create a folder inside of the `~/.config/Fuzion` folder with a name of your choice, and paste the `config.json` inside of that folder.
 
@@ -204,8 +152,3 @@ Special thanks to the Original AimTux project: [https://github.com/AimTuxOfficia
 Special thanks to [@aixxe](http://www.github.com/aixxe/) ([aixxe.net](http://www.aixxe.net)) for the skin changer and with the initial project, as well as helping this project with source code (Available on [@aixxe's](http://www.github.com/aixxe/) github page.).
 
 This project was also originally based upon Atex's [Linux Basehook](http://unknowncheats.me/forum/counterstrike-global-offensive/181878-linux-basehook.html).
-
-[telans](https://github.com/telans) for the AUR package [fuzion-git](https://aur.archlinux.org/packages/fuzion-git/)
-
-The Zedeware project is also glad to know [@LWSS](http://www.github.com/LWSS/) who is still providing us with quality code.
-Special thanks to [@acuifex](http://www.github.com/acuifex/) for helping with the project a lot.

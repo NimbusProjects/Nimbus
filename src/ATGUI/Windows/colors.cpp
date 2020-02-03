@@ -5,8 +5,6 @@
 #include "../../ImGUI/imgui_internal.h"
 #include "../atgui.h"
 
-#pragma GCC diagnostic ignored "-Wformat-security"
-
 bool Colors::showWindow = false;
 
 void Colors::RenderWindow()
@@ -67,6 +65,7 @@ void Colors::RenderWindow()
 			{ "Spread", &Settings::ESP::Spread::color },
 			{ "SpreadLimit", &Settings::ESP::Spread::spreadLimitColor},
 			{ "Hitmarker", &Settings::ESP::Hitmarker::color },
+			{ "ESP - Zeus/Knife Radius", &Settings::ESP::ZeusRadius::ZeusColor },
 			{ "ESP - Enemy", &Settings::ESP::enemyColor },
 			{ "ESP - Team", &Settings::ESP::allyColor },
 			{ "ESP - Enemy Visible", &Settings::ESP::enemyVisibleColor },
@@ -106,6 +105,8 @@ void Colors::RenderWindow()
 			{ "ESP - Danger Zone: Tablet", &Settings::ESP::DangerZone::tabletColor },
 			{ "ESP - Danger Zone: Healthshot", &Settings::ESP::DangerZone::healthshotColor },
 			{ "ESP - Danger Zone: Melee", &Settings::ESP::DangerZone::meleeColor },
+			{ "BackTrack Chams - First", &Settings::BackTrack::Chams::firstcolor },
+			{ "BackTrack Chams - Fade", &Settings::BackTrack::Chams::fadecolor },
 			{ "Chams - Team", &Settings::ESP::Chams::allyColor },
 			{ "Chams - Team Visible", &Settings::ESP::Chams::allyVisibleColor },
 			{ "Chams - Enemy", &Settings::ESP::Chams::enemyColor },
@@ -141,6 +142,7 @@ void Colors::RenderWindow()
 			{ "Glow - Chicken", &Settings::ESP::Glow::chickenColor },
 			{ "Sky", &Settings::NoSky::color },
 			{ "Walls", &Settings::ASUSWalls::color },
+
 	};
 
 	const char* colorNames[IM_ARRAYSIZE(colors)];
@@ -149,7 +151,7 @@ void Colors::RenderWindow()
 
 	static int colorSelected = 0;
 
-	if (ImGui::Begin(XORSTR("Colors"), &Colors::showWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_ShowBorders | ImGuiWindowFlags_NoResize))
+if (ImGui::Begin(XORSTR("Colors"), &Colors::showWindow, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_ShowBorders | ImGuiWindowFlags_NoResize))
 	{
 		Settings::UI::Windows::Colors::open = true;
 		ImVec2 temp = ImGui::GetWindowSize();

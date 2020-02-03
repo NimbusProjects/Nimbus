@@ -96,7 +96,7 @@ void ClanTagChanger::UpdateClanTagCallback()
 	if (current_animation >= 0)
 		ClanTagChanger::animation = &ClanTagChanger::animations[current_animation];
 }
-void ClanTagChanger::CreateMove(CUserCmd* cmd)
+void ClanTagChanger::CreateMove(/*CUserCmd* cmd*/)
 {
 	if (!Settings::ClanTagChanger::enabled)
 		return;
@@ -104,22 +104,33 @@ void ClanTagChanger::CreateMove(CUserCmd* cmd)
 	if (!engine->IsInGame())
 		return;
 
+	long currentTime_ms = Util::GetEpochTime();
+	static long timeStamp = currentTime_ms;
+	static std::string oldClantag;
+
+	if (currentTime_ms - timeStamp > ClanTagChanger::animation->GetCurrentFrame().time)
+	{
+		timeStamp = currentTime_ms;
+		ClanTagChanger::animation->NextFrame();
+	}
+
+	std::string ctWithEscapesProcessed = std::string(Settings::ClanTagChanger::value);
+	Util::StdReplaceStr(ctWithEscapesProcessed, "\\n", "\n"); // compute time impact? also, referential so i assume RAII builtin cleans it up...
+
 	if (Settings::ClanTagChanger::type == ClanTagType::STATIC)
 	{
-		std::string ctWithEscapesProcessed = std::string(Settings::ClanTagChanger::value);
-		Util::StdReplaceStr(ctWithEscapesProcessed, "\\n", "\n"); // compute time impact? also, referential so i assume RAII builtin cleans it up...
+		if (oldClantag == ctWithEscapesProcessed)
+			return;
+
 		SendClanTag(ctWithEscapesProcessed.c_str(), "");
+		oldClantag = ctWithEscapesProcessed;
 	}
 	else
 	{
-		long currentTime_ms = Util::GetEpochTime();
-		static long timeStamp = currentTime_ms;
+		if (oldClantag == Util::WstringToString(ClanTagChanger::animation->GetCurrentFrame().text))
+			return;
 
-		if (currentTime_ms - timeStamp > ClanTagChanger::animation->GetCurrentFrame().time)
-		{
-			timeStamp = currentTime_ms;
-			ClanTagChanger::animation->NextFrame();
-		}
 		SendClanTag(Util::WstringToString(ClanTagChanger::animation->GetCurrentFrame().text).c_str(), "");
+		oldClantag = Util::WstringToString(ClanTagChanger::animation->GetCurrentFrame().text);
 	}
 }

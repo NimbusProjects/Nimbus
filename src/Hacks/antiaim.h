@@ -5,6 +5,10 @@
 
 namespace AntiAim
 {
+    extern QAngle calculatedDesyncAngle;
+    extern QAngle fakeAngle;
+    extern QAngle realAngle;
+
     float GetMaxDelta( CCSGOAnimState *animState );
 
     //Hooks

@@ -1,4 +1,5 @@
 #include "chams.h"
+
 #include "lagcomp.h"
 
 #include "../Utils/xorstring.h"
@@ -17,6 +18,7 @@ HealthColorVar Settings::ESP::Chams::allyVisibleColor = ImColor(0, 255, 0, 255);
 HealthColorVar Settings::ESP::Chams::enemyColor = ImColor(255, 0, 0, 255);
 HealthColorVar Settings::ESP::Chams::enemyVisibleColor = ImColor(255, 255, 0, 255);
 HealthColorVar Settings::ESP::Chams::localplayerColor = ImColor(0, 255, 255, 255);
+HealthColorVar Settings::ESP::Chams::backtrackColor = ImColor(0, 255, 255, 255);
 ColorVar Settings::ESP::Chams::Arms::color = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Chams::Weapon::color = ImColor(255, 255, 255, 255);
 ChamsType Settings::ESP::Chams::type = ChamsType::CHAMS;
@@ -123,8 +125,10 @@ static void DrawPlayer(void* thisptr, void* context, void *state, const ModelRen
 	// No need to call DME again, it already gets called in DrawModelExecute.cpp
 }
 
+
 static void DrawRecord(void* thisptr, void* context, void *state, const ModelRenderInfo_t &pInfo, matrix3x4_t* pCustomBoneToWorld)
 {
+/*
 	if (!Settings::LagComp::enabled)
         return;
 
@@ -135,10 +139,12 @@ static void DrawRecord(void* thisptr, void* context, void *state, const ModelRen
 		return;
 
  	IMaterial* visible_material = materialChams;
- 	Color visColor = Color(255, 0, 0, 255);
+	Color visColor = Color::FromImColor(Settings::ESP::Chams::backtrackColor.Color(localplayer));
  	visible_material->ColorModulate(visColor);
- 	visible_material->AlphaModulate(0.2f);
+ 	visible_material->AlphaModulate(0.1f);
 	auto &tick = LagComp::ticks.back();
+    for (auto& tick : LagComp::ticks)
+    {
 	for (auto &record : tick.records)
 	{
 		if (!record.boneMatrix)
@@ -147,7 +153,8 @@ static void DrawRecord(void* thisptr, void* context, void *state, const ModelRen
 		(Vector)pInfo.origin = record.origin;
 		modelRender->ForcedMaterialOverride(visible_material);
 		modelRenderVMT->GetOriginalMethod<DrawModelExecuteFn>(21)(thisptr, context, state, pInfo, (matrix3x4_t*)record.boneMatrix);
-	}
+		}
+	}*/
 }
 
 static void DrawWeapon(const ModelRenderInfo_t& pInfo)
@@ -198,6 +205,9 @@ void Chams::DrawModelExecute(void* thisptr, void* context, void *state, const Mo
 
 	if (!pInfo.pModel)
 		return;
+	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+
+	C_BasePlayer* entity = (C_BasePlayer*) entityList->GetClientEntity(pInfo.entity_index);
 
 	static bool materialsCreated = false;
 	if (!materialsCreated)
@@ -213,8 +223,10 @@ void Chams::DrawModelExecute(void* thisptr, void* context, void *state, const Mo
 
 	std::string modelName = modelInfo->GetModelName(pInfo.pModel);
 
-	if (modelName.find(XORSTR("models/player")) != std::string::npos)
+	if (modelName.find(XORSTR("models/player")) != std::string::npos){
+		DrawRecord(thisptr, context, state, pInfo, pCustomBoneToWorld);
 		DrawPlayer(thisptr, context, state, pInfo, pCustomBoneToWorld);
+	}
 	else if (modelName.find(XORSTR("arms")) != std::string::npos)
 		DrawArms(pInfo);
 	else if (modelName.find(XORSTR("weapon")) != std::string::npos)

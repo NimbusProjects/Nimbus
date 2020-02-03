@@ -9,7 +9,6 @@
 #include <codecvt>
 #include <locale> //wstring_convert
 
-#pragma GCC diagnostic ignored "-Wformat-security"
 
 void Util::Log(char const * const format, ...)
 {
@@ -24,7 +23,7 @@ void Util::Log(char const * const format, ...)
     } else {
         logFile = fopen(Util::logFileName, "a"); // append to log
     }
-    setbuf( logFile, nullptr ); // Turns off buffered I/O; decreases performance, but no unflushed buffer if crash occurs.
+    setbuf( logFile, nullptr ); // Turn off buffered I/O, decreases performance but if crash occurs, no unflushed buffer.
     va_list args;
     va_start(args, format);
     vsnprintf(buffer, 4096, format, args);
@@ -104,7 +103,7 @@ std::string Util::WstringToString(std::wstring wstr)
 	{
 		return converter.to_bytes(wstr);
 	}
-	catch (std::range_error&)
+	catch (std::range_error)
 	{
 		std::stringstream s;
 		s << wstr.c_str();
@@ -120,7 +119,7 @@ std::wstring Util::StringToWstring(std::string str)
 	{
 		return converter.from_bytes(str);
 	}
-	catch (std::range_error&)
+	catch (std::range_error)
 	{
 		std::wostringstream s;
 		s << str.c_str();
@@ -143,6 +142,19 @@ ImColor Util::GetRainbowColor(float speed)
 
 	return ImColor::HSV(hue, 1.0f, 1.0f);
 }
+/*
+ImColor Util::GetFade(float speed)
+{
+	speed = 0.002f * speed;
+	long now = Util::GetEpochTime();
+	//float hue = (now % (int)(1.0f / speed)) * speed;
+	float fade = (now % (int)(1.0f / speed)) * speed;
+
+	return ImColor::HSV(0.5f, fade, fade);
+}
+*/
+
+
 
 Color Util::GetHealthColor(int hp)
 {

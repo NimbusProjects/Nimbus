@@ -1,5 +1,6 @@
 #include <iomanip>
 
+#include "../Utils/bonemaps.h"
 #include "esp.h"
 #include "autowall.h"
 #include "lagcomp.h"
@@ -9,10 +10,9 @@
 #include "../Utils/draw.h"
 #include "../Utils/math.h"
 #include "../Utils/entity.h"
-#include "../Utils/bonemaps.h"
 #include "../Utils/xorstring.h"
 #include "../Hooks/hooks.h"
-
+#include "logshots.h"
 #include "../ATGUI/texture.h"
 #include "../Resources/tux.h"
 
@@ -91,6 +91,7 @@ bool Settings::ESP::Info::grabbingHostage = false;
 bool Settings::ESP::Info::rescuing = false;
 bool Settings::ESP::Info::location = false;
 bool Settings::ESP::Info::money = false;
+bool Settings::ESP::Info::missedShots = false;
 bool Settings::ESP::Boxes::enabled = false;
 BoxType Settings::ESP::Boxes::type = BoxType::FRAME_2D;
 bool Settings::ESP::Sprite::enabled = false;
@@ -100,17 +101,20 @@ BarColorType Settings::ESP::Bars::colorType = BarColorType::HEALTH_BASED;
 BarType Settings::ESP::Bars::type = BarType::HORIZONTAL;
 bool Settings::ESP::Tracers::enabled = false;
 TracerType Settings::ESP::Tracers::type = TracerType::BOTTOM;
+
 bool Settings::ESP::BulletTracers::enabled = false;
 bool Settings::ESP::FOVCrosshair::enabled = false;
 bool Settings::ESP::FOVCrosshair::filled = false;
 ColorVar Settings::ESP::FOVCrosshair::color = ImColor(255, 0, 0, 255);
 bool Settings::ESP::Skeleton::enabled = false;
+bool Settings::ESP::ZeusRadius::enabled = false;
+ColorVar Settings::ESP::ZeusRadius::ZeusColor = ImColor(255,0,0,255);
 bool Settings::ESP::Sounds::enabled = false;
 int Settings::ESP::Sounds::time = 1000;
 bool Settings::NoScopeBorder::enabled = false;
 bool Settings::ESP::HeadDot::enabled = false;
+bool Settings::ESP::backtrack::enabled = true;
 float Settings::ESP::HeadDot::size = 2.f;
-bool Settings::ESP::Backtrack::enabled = false;
 
 bool Settings::ESP::Spread::enabled = false;
 bool Settings::ESP::Spread::spreadLimit = false;
@@ -149,7 +153,6 @@ bool Settings::Debug::BoneMap::draw = false;
 int Settings::Debug::BoneMap::modelID = 1253;
 bool Settings::Debug::BoneMap::justDrawDots = false;
 bool Settings::Debug::AnimLayers::draw = false;
-bool Settings::Debug::AntiAim::draw = false;
 
 /* The engine->WorldToScreenMatrix() function can't be called at all times
  * So this is Updated in the Paint Hook for us */
@@ -616,81 +619,14 @@ static void DrawSkeleton( C_BasePlayer* player, C_BasePlayer* localplayer ) {
 		Draw::AddLine( vBonePos1.x, vBonePos1.y, vBonePos2.x, vBonePos2.y, Entity::IsTeamMate(player, localplayer) ? Settings::ESP::Skeleton::allyColor.Color() : Settings::ESP::Skeleton::enemyColor.Color());
 	}
 }
-static void DrawAATrace( QAngle fake, QAngle actual ) {
-
-	if (!Settings::Debug::AntiAim::draw)
-		return;
-
-    C_BasePlayer* localPlayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
-    Vector src3D, dst3D, forward;
-    Vector src, dst;
-    char* string;
-    Vector2D nameSize;
-    ImColor color;
-
-    src3D = localPlayer->GetVecOrigin();
-// LBY
-    Math::AngleVectors( QAngle(0, *localPlayer->GetLowerBodyYawTarget(), 0), forward );
-    dst3D = src3D + ( forward * 50 );
-
-    if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( dst3D, dst ) )
-        return;
-
-    color = ImColor( 135, 235, 169 );
-    Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
-    string = XORSTR("LBY");
-    nameSize = Draw::GetTextSize( string, esp_font );
-    Draw::AddText(dst.x, dst.y, string, color );
-//////////////////////////////////
-
-// FAKE
-    Math::AngleVectors( QAngle(0, fake.y, 0), forward );
-    dst3D = src3D + ( forward * 50.f );
-    if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( dst3D, dst ) )
-        return;
-
-    color = ImColor( 5, 200, 5 );
-    Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
-    string = XORSTR("FAKE");
-    nameSize = Draw::GetTextSize( string, esp_font );
-    Draw::AddText(dst.x, dst.y, string, color );
-//////////////////////////////////
-
-// ACTUAL
-    Math::AngleVectors( QAngle(0, actual.y, 0), forward );
-    dst3D = src3D + ( forward * 50.f );
-    if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( dst3D, dst ) )
-        return;
-
-    color = ImColor( 225, 5, 5 );
-    Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
-    string = XORSTR("REAL");
-    nameSize = Draw::GetTextSize( string, esp_font );
-    Draw::AddText(dst.x, dst.y, string, color );
-//////////////////////////////////
-
-// FEET YAW
-    Math::AngleVectors( QAngle(0, localPlayer->GetAnimState()->currentFeetYaw, 0), forward );
-    dst3D = src3D + ( forward * 50.f );
-
-    if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( dst3D, dst ) )
-        return;
-
-    color = ImColor( 225, 225, 80 );
-    Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
-    string = XORSTR("FEET");
-    nameSize = Draw::GetTextSize( string, esp_font );
-    Draw::AddText(dst.x, dst.y, string, color );
-//////////////////////////////////
-}
 static void DrawBulletTrace( C_BasePlayer* player ) {
-    Vector src3D, dst3D, forward, right, up;
-    Vector src, dst, src2, dst2;
+	Vector src3D, dst3D, forward;
+	Vector src, dst;
 	trace_t tr;
 	Ray_t ray;
 	CTraceFilter filter;
 
-    Math::AngleVectors( *player->GetEyeAngles(), forward, right, up );
+	Math::AngleVectors( *player->GetEyeAngles(), forward );
 	filter.pSkip = player;
 	src3D = player->GetEyePosition();
 	dst3D = src3D + ( forward * 8192 );
@@ -699,20 +635,100 @@ static void DrawBulletTrace( C_BasePlayer* player ) {
 
 	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
 
-    if ( debugOverlay->ScreenPosition( src3D - (right * 3), src ) || debugOverlay->ScreenPosition( tr.endpos - (right * 3), dst ) ||
-        debugOverlay->ScreenPosition( src3D + (right * 3), src2 ) || debugOverlay->ScreenPosition( tr.endpos + (right * 3), dst2 ) )
-        return;
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
 
-    Draw::AddLine( src.x, src.y, dst.x, dst.y, ESP::GetESPPlayerColor( player, true ) );
-    Draw::AddLine( src2.x, src2.y, dst2.x, dst2.y, ESP::GetESPPlayerColor( player, true ) );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, ESP::GetESPPlayerColor( player, true ) );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, ESP::GetESPPlayerColor( player, false ) ); // do we really need this? it's not drawing in valve and buggy in imgui
+}
+static void DrawAATrace( QAngle fake, QAngle actual ) {
+	C_BasePlayer* localPlayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
+	Vector src3D, dst3D, forward;
+	Vector src, dst;
+	trace_t tr;
+	Ray_t ray;
+	CTraceFilter filter;
+	char* string;
+	Vector2D nameSize;
+	ImColor color;
 
-    for(Vector test = src3D; test.DistTo(src3D) < tr.endpos.DistTo(src3D); test += (forward * 20)){
-        if ( debugOverlay->ScreenPosition( test - (right * 3), src ) || debugOverlay->ScreenPosition( test + (right * 3), dst ) )
-            continue;
+	filter.pSkip = localPlayer;
+	src3D = localPlayer->GetVecOrigin();
+// LBY
+	Math::AngleVectors( QAngle(0, *localPlayer->GetLowerBodyYawTarget(), 0), forward );
+	dst3D = src3D + ( forward * 50 );
 
-        Draw::AddLine( src.x, src.y, dst.x, dst.y, ESP::GetESPPlayerColor( player, true ) );
-    }
-//	Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, ESP::GetESPPlayerColor( player, false ) );
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 135, 235, 169 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("LBY");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// FAKE
+	Math::AngleVectors( QAngle(0, fake.y, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 5, 200, 5 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("FAKE");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// ACTUAL
+	Math::AngleVectors( QAngle(0, actual.y, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 225, 5, 5 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("REAL");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// FEET YAW
+	Math::AngleVectors( QAngle(0, localPlayer->GetAnimState()->currentFeetYaw, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 225, 225, 80 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("FEET");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
 }
 static void DrawTracer( C_BasePlayer* player ) {
 	Vector src3D;
@@ -722,6 +738,7 @@ static void DrawTracer( C_BasePlayer* player ) {
 	if ( debugOverlay->ScreenPosition( src3D, src ) )
 		return;
 
+	const std::unordered_map<int, int> *modelType = BoneMaps::GetModelTypeBoneMap(player);
 	int x = Paint::engineWidth / 2;
 	int y = 0;
 
@@ -730,7 +747,7 @@ static void DrawTracer( C_BasePlayer* player ) {
 	else if ( Settings::ESP::Tracers::type == TracerType::BOTTOM )
 		y = Paint::engineHeight;
 
-	bool bIsVisible = Entity::IsVisible( player, BONE_HEAD, 180.f, Settings::ESP::Filters::smokeCheck );
+	bool bIsVisible = Entity::IsVisible( player, (*modelType).at(BONE_HEAD), 180.f, Settings::ESP::Filters::smokeCheck );
 	Draw::AddLine( ( int ) ( src.x ), ( int ) ( src.y ), x, y, ESP::GetESPPlayerColor( player, bIsVisible ) );
 }
 static void DrawAimbotSpot( ) {
@@ -769,13 +786,15 @@ static void DrawBoneMap( C_BasePlayer* player ) {
 		return;
 
 	for( int i = 1; i < pStudioModel->numbones; i++ ){
-		bone3D = player->GetBonePosition( i );
-        mstudiobone_t* pBone = pStudioModel->pBone( i );
-		if( !pBone )
+    bone3D = player->GetBonePosition( i );
+
+		mstudiobone_t* pBone = pStudioModel->pBone( i );
+
+    if( !pBone )
 			continue;
 
-        if ( debugOverlay->ScreenPosition( bone3D, bone2D ) )
-			continue;
+    if ( debugOverlay->ScreenPosition( bone3D, bone2D ) )
+     continue;
 		if( Settings::Debug::BoneMap::justDrawDots ){
 			Draw::AddCircleFilled( bone2D.x, bone2D.y, 2.0f, ImColor( 255, 0, 255, 255 ), 10 );
 		} else {
@@ -790,7 +809,7 @@ static void DrawBoneMap( C_BasePlayer* player ) {
 }
 static void DrawAutoWall(C_BasePlayer *player) {
 	const std::unordered_map<int, int> *modelType = BoneMaps::GetModelTypeBoneMap(player);
-	for( int i = 0; i < 31; i++ )
+  for( int i = 0; i < 31; i++ )
 	{
 		auto bone = modelType->find(i);
 		if( bone == modelType->end() || bone->second <= BONE_INVALID )
@@ -864,31 +883,68 @@ static void DrawAutoWall(C_BasePlayer *player) {
 static void DrawHeaddot( C_BasePlayer* player ) {
 
 	Vector head2D;
-	Vector head3D = player->GetBonePosition( BONE_HEAD );
+	const std::unordered_map<int, int> *modelType = BoneMaps::GetModelTypeBoneMap(player);
+
+	Vector head3D = player->GetBonePosition( (*modelType).at(BONE_HEAD) );
+
 	if ( debugOverlay->ScreenPosition( Vector( head3D.x, head3D.y, head3D.z ), head2D ) )
 		return;
 
 	bool bIsVisible = false;
 	if ( Settings::ESP::Filters::visibilityCheck || Settings::ESP::Filters::legit )
-		bIsVisible = Entity::IsVisible( player, BONE_HEAD, 180.f, Settings::ESP::Filters::smokeCheck );
+		bIsVisible = Entity::IsVisible( player, (*modelType).at(BONE_HEAD), 180.f, Settings::ESP::Filters::smokeCheck );
 
 	Draw::AddCircleFilled( head2D.x, head2D.y, Settings::ESP::HeadDot::size, ESP::GetESPPlayerColor( player, bIsVisible ), 10 );
 }
 
-static void DrawBacktrack( C_BasePlayer* player ) 
-{
-	Vector head2D;
+static void DrawBackTrack(C_BasePlayer* player, bool draw_headdot = true,
+                          bool draw_skeleton = false) {
+  /*Vector head2D;
 
-    for (auto& tick : LagComp::ticks)
-    {
-        for (auto& record : tick.records)
-        {
-        	if ( debugOverlay->ScreenPosition( record.head, head2D ) )
-				continue;
-			Draw::AddCircleFilled( head2D.x, head2D.y, Settings::ESP::HeadDot::size, ESP::GetESPPlayerColor( player, false ), 3 );
-        }
+  for (auto&& tick : BackTrack::backtrack_frames) {
+    for (auto&& record : tick.records) {
+      if (debugOverlay->ScreenPosition(record.head, head2D)) continue;
+      Draw::AddCircleFilled(head2D.x, head2D.y, Settings::ESP::HeadDot::size,
+                            ESP::GetESPPlayerColor(player, false), 3);
+
     }
+  }*/
 }
+
+static void DrawZeusBot( C_BasePlayer *localPlayer, ImColor playerColor ) {
+
+	          localPlayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
+
+            if(!engine->IsInGame())
+              return;
+
+
+            C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*) entityList->GetClientEntityFromHandle(localPlayer->GetActiveWeapon());
+            ItemDefinitionIndex itemDefinitionIndex = *activeWeapon->GetItemDefinitionIndex();
+
+            float percent = ( float ) 1 / ( float ) 100;
+            Color drawColor = Color::FromImColor( playerColor );
+
+            float circleRadius = fabs( percent - 1.0f ) * 180.0f;
+            float points = std::max(12.0f, circleRadius * 0.75f);
+
+
+            float circleRadiusKnife = fabs( percent - 1.0f ) * 64.0f;
+            float points2 = std::max(12.0f, circleRadius * 0.75f);
+
+           //Is this enough fucking checks for you, VALVe? ffs...
+
+            if(Settings::ESP::ZeusRadius::enabled && !Util::Items::IsKnife(itemDefinitionIndex) && itemDefinitionIndex == ItemDefinitionIndex::WEAPON_TASER)
+              Draw::AddCircle3D(localPlayer->GetVecOrigin(), circleRadius, ImColor(Settings::ESP::ZeusRadius::ZeusColor.Color() ), (int)points );
+
+            if(Settings::ESP::ZeusRadius::enabled && Util::Items::IsKnife(itemDefinitionIndex) && itemDefinitionIndex != ItemDefinitionIndex::WEAPON_TASER)
+              Draw::AddCircle3D(localPlayer->GetVecOrigin(), circleRadiusKnife, ImColor(Settings::ESP::ZeusRadius::ZeusColor.Color() ), (int)points2 );
+
+
+
+}
+
+
 
 static void DrawSounds( C_BasePlayer *player, ImColor playerColor ) {
     std::unique_lock<std::mutex> lock( footstepMutex, std::try_to_lock );
@@ -1037,6 +1093,12 @@ static void DrawPlayerText( C_BasePlayer* player, C_BasePlayer* localplayer, int
 		Draw::AddText( x + w + boxSpacing, ( y + h - textSize.y ), buf.c_str(), Entity::IsTeamMate(player, localplayer) ? Settings::ESP::allyInfoColor.Color() : Settings::ESP::enemyInfoColor.Color() );
 	}
 
+	if (Settings::ESP::Info::missedShots)
+	{
+		std::string buf = XORSTR("Missed : ") + std::to_string(LogShots::missedShots[player->GetIndex() - 1]);
+		Draw::Text(x + w + boxSpacing, (int)(y + h - textSize.y * (Settings::ESP::Info::health ? 2 : 1)), buf.c_str(), esp_font, Color(255, 255, 255));
+	}
+
 	// armor
 	if ( Settings::ESP::Info::armor ) {
 		std::string buf = std::to_string( player->GetArmor() ) + (player->HasHelmet() ? XORSTR(" AP*") : XORSTR(" AP"));
@@ -1118,10 +1180,12 @@ static void DrawPlayer(C_BasePlayer* player)
 	if (player != localplayer && Entity::IsTeamMate(player, localplayer) && !Settings::ESP::Filters::allies)
 		return;
 
-	bool bIsVisible = false;
+	const std::unordered_map<int, int> *modelType = BoneMaps::GetModelTypeBoneMap(player);
+
+  bool bIsVisible = false;
 	if (Settings::ESP::Filters::visibilityCheck || Settings::ESP::Filters::legit)
 	{
-		bIsVisible = Entity::IsVisible(player, BONE_HEAD, 180.f, Settings::ESP::Filters::smokeCheck);
+		bIsVisible = Entity::IsVisible(player, (*modelType).at(BONE_HEAD), 180.f, Settings::ESP::Filters::smokeCheck);
 		if (!bIsVisible && Settings::ESP::Filters::legit)
 			return;
 	}
@@ -1152,9 +1216,9 @@ static void DrawPlayer(C_BasePlayer* player)
 
 	if (Settings::ESP::HeadDot::enabled)
 		DrawHeaddot(player);
-
-	if (Settings::ESP::Backtrack::enabled)
-		DrawBacktrack(player);
+		//DrawBackTrack(player);
+	if (Settings::ESP::backtrack::enabled)
+		//Drawbacktrack(player);
 
 	if (Settings::Debug::AutoWall::debugView)
 		DrawAutoWall(player);
@@ -1165,9 +1229,9 @@ static void DrawPlayer(C_BasePlayer* player)
 	if (Settings::Debug::AutoAim::drawTarget)
 		DrawAimbotSpot();
 
-    if (Settings::ESP::Sounds::enabled) {
-		DrawSounds( player, playerColor );
-	}
+    if (Settings::ESP::Sounds::enabled)
+		  DrawSounds( player, playerColor );
+
 
 
 	/* Checks various Text Settings */
@@ -1529,6 +1593,7 @@ static void DrawGlow()
 		if (client->m_ClassID == EClassIds::CCSPlayer)
 		{
 			C_BasePlayer* player = (C_BasePlayer*) glow_object.m_pEntity;
+			const std::unordered_map<int, int> *modelType = BoneMaps::GetModelTypeBoneMap(player);
 
 			if (player->GetDormant() || !player->GetAlive())
 				continue;
@@ -1541,7 +1606,7 @@ static void DrawGlow()
 			{
 				if (!Entity::IsTeamMate(player, localplayer))
 				{
-					if (Entity::IsVisible(player, BONE_HEAD))
+					if (Entity::IsVisible(player, (*modelType).at(BONE_HEAD)))
 						color = Settings::ESP::Glow::enemyVisibleColor.Color(player);
 					else
 						color = Settings::ESP::Glow::enemyColor.Color(player);
@@ -1639,6 +1704,7 @@ static void DrawFOVCrosshair()
 		Draw::AddCircle(Paint::engineWidth / 2, Paint::engineHeight / 2, radius, Settings::ESP::FOVCrosshair::color.Color(), std::max(12, (int)radius*2));
 }
 
+
 static void DrawSpread()
 {
     if ( !Settings::ESP::Spread::enabled && !Settings::ESP::Spread::spreadLimit )
@@ -1654,24 +1720,35 @@ static void DrawSpread()
         return;
 
     if ( Settings::ESP::Spread::enabled ) {
+        int width, height;
+		engine->GetScreenSize( width, height );
+
         float cone = activeWeapon->GetSpread() + activeWeapon->GetInaccuracy();
         if ( cone > 0.0f ) {
-            float radius = ( cone * Paint::engineHeight ) / 1.5f;
-            Draw::AddRect( ( ( Paint::engineWidth / 2 ) - radius ), ( Paint::engineHeight / 2 ) - radius + 1,
-                               ( Paint::engineWidth / 2 ) + radius + 1, ( Paint::engineHeight / 2 ) + radius + 2,
-                               Settings::ESP::Spread::color.Color() );
+            float radius = ( cone * height ) / 1.5f;
+            // Draw::AddRect( ( ( width / 2 ) - radius ), ( height / 2 ) - radius + 1,
+            //                    ( width / 2 ) + radius + 1, ( height / 2 ) + radius + 2,
+            //                    Settings::ESP::Spread::color.Color() );
+	    Draw::FilledCircle(Vector2D(((width/2)-0), (height/2)-0), radius, radius, Color::FromImColor(Settings\
+   ::ESP::Spread::color.Color()));
         }
     }
     if ( Settings::ESP::Spread::spreadLimit ) {
+        int width, height;
+		engine->GetScreenSize( width, height );
+
         float cone = Settings::Aimbot::SpreadLimit::value;
         if ( cone > 0.0f ) {
-            float radius = ( cone * Paint::engineHeight ) / 1.5f;
-            Draw::AddRect( ( ( Paint::engineWidth / 2 ) - radius ), ( Paint::engineHeight / 2 ) - radius + 1,
-                               ( Paint::engineWidth / 2 ) + radius + 1, ( Paint::engineHeight / 2 ) + radius + 2 ,
-                               Settings::ESP::Spread::spreadLimitColor.Color() );
+            float radius = ( cone * height ) / 1.5f;
+            // Draw::AddRect( ( ( width / 2 ) - radius ), ( height / 2 ) - radius + 1,
+            //                    ( width / 2 ) + radius + 1, ( height / 2 ) + radius + 2 ,
+            //                    Settings::ESP::Spread::spreadLimitColor.Color() );
+	    Draw::FilledCircle(Vector2D(((width/2)-0), (height/2)-0), radius, radius, Color::FromImColor(Settings\
+   ::ESP::Spread::color.Color()));
         }
     }
 }
+
 
 static void DrawScope()
 {
@@ -1706,8 +1783,11 @@ void ESP::Paint()
 		return;
 
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+	ImColor playerColor;
+
 	if (!localplayer)
 		return;
+
 
 	for (int i = 1; i < entityList->GetHighestEntityIndex(); i++)
 	{
@@ -1800,15 +1880,18 @@ void ESP::Paint()
 				DrawDZItems(entity, localplayer);
 		}
 	}
-
-    if (Settings::ThirdPerson::enabled)
-        DrawAATrace(fake, actual);
+	if (Settings::ThirdPerson::enabled)
+		DrawAATrace(fake, actual);
 	if (Settings::ESP::FOVCrosshair::enabled)
 		DrawFOVCrosshair();
 	if (Settings::ESP::Spread::enabled || Settings::ESP::Spread::spreadLimit)
 		DrawSpread();
 	if (Settings::NoScopeBorder::enabled && localplayer->IsScoped())
 		DrawScope();
+  if (Settings::ESP::ZeusRadius::enabled)
+      DrawZeusBot(localplayer, playerColor);
+
+
 }
 
 void ESP::DrawModelExecute()
@@ -1825,12 +1908,20 @@ void ESP::DrawModelExecute()
 
 void ESP::CreateMove(CUserCmd* cmd)
 {
+
+	if (!Settings::ESP::enabled)
+		return;
+
+	if (!engine->IsInGame())
+		return;
+
+
 	viewanglesBackup = cmd->viewangles;
 
-    if(CreateMove::sendPacket)
-        fake = CreateMove::lastTickViewAngles;
-    else
-        actual = cmd->viewangles;
+	if(CreateMove::sendPacket)
+		fake = CreateMove::lastTickViewAngles;
+	else
+		actual = cmd->viewangles;
 
     if( Settings::ESP::enabled && Settings::ESP::Sounds::enabled && (Settings::ESP::Filters::allies || Settings::ESP::Filters::enemies || Settings::ESP::Filters::localplayer) ){
         CheckActiveSounds();

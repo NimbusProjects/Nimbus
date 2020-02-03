@@ -110,6 +110,13 @@ struct Ray_t
 	}
 };
 
+
+class IEntityEnumerator
+{
+public:
+	// This gets called with each handle
+	virtual bool EnumEntity(IHandleEntity* pHandleEntity) = 0;
+};
 class ITraceFilter
 {
 public:
@@ -133,13 +140,22 @@ public:
 	void* pSkip;
 };
 
-class IEntityEnumerator
+class CTraceFilterEntitiesOnly : public ITraceFilter
 {
 public:
-	// This gets called with each handle
-	virtual bool EnumEntity(IHandleEntity* pHandleEntity) = 0;
-};
+	bool ShouldHitEntity(C_BaseEntity* pEntityHandle, int contentsMask)
+	{
+		return !(pEntityHandle == pSkip);
+	}
 
+
+	virtual TraceType_t GetTraceType() const
+	{
+		return TRACE_ENTITIES_ONLY;
+	}
+
+	void* pSkip;
+};
 class IEngineTrace
 {
 public:

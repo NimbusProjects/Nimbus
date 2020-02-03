@@ -27,6 +27,7 @@ VMT* launcherMgrVMT = nullptr;
 VMT* engineVGuiVMT = nullptr;
 VMT* soundVMT = nullptr;
 VMT* uiEngineVMT = nullptr;
+VMT* netChannelVMT = nullptr;
 
 uintptr_t oSwapWindow;
 uintptr_t* swapWindowJumpAddress = nullptr;
@@ -58,12 +59,13 @@ GetSequenceActivityFn GetSeqActivity;
 
 uintptr_t SetAbsOriginFnAddr;
 
-//RandomSeedFn RandomSeed;
-//RandomFloatFn RandomFloat;
-//RandomFloatExpFn RandomFloatExp;
-//RandomIntFn RandomInt;
-//RandomGaussianFloatFn RandomGaussianFloat;
-
+/*
+RandomSeedFn RandomSeed;
+RandomFloatFn RandomFloatA;
+RandomFloatExpFn RandomFloatExp;
+RandomIntFn RandomInt;
+RandomGaussianFloatFn RandomGaussianFloat;
+*/
 SetNamedSkyBoxFn SetNamedSkyBox;
 
 std::vector<dlinfo_t> libraries;
@@ -260,7 +262,7 @@ void Hooker::FindPrediction()
 void Hooker::FindSetLocalPlayerReady()
 {
 	// xref: "deferred"
-	uintptr_t func_address = PatternFinder::FindPatternInModule((XORSTR("client_panorama_client.so")),    
+	uintptr_t func_address = PatternFinder::FindPatternInModule((XORSTR("client_panorama_client.so")),
 																(unsigned char*) XORSTR("\x55\x48\x89\xF7\x48\x8D\x35\x00\x00\x00\x00\x48\x89\xE5\xE8\x00\x00\x00\x00\x85\xC0"),
 																XORSTR("xxxxxxx????xxxx????xx"));
 
@@ -332,20 +334,21 @@ void Hooker::FindLoadFromBuffer()
 																XORSTR("xxxxxxxxxxxxxxxxxxx????xx"));
 	LoadFromBuffer = reinterpret_cast<LoadFromBufferFn>(func_address);
 }
+
 /*
 void Hooker::FindVstdlibFunctions()
 {
 	void* handle = dlopen(XORSTR("./bin/linux64/libvstdlib_client.so"), RTLD_NOLOAD | RTLD_NOW);
 
 	RandomSeed = reinterpret_cast<RandomSeedFn>(dlsym(handle, XORSTR("RandomSeed")));
-	RandomFloat = reinterpret_cast<RandomFloatFn>(dlsym(handle, XORSTR("RandomFloat")));
+	RandomFloatA = reinterpret_cast<RandomFloatFn>(dlsym(handle, XORSTR("RandomFloat")));
 	RandomFloatExp = reinterpret_cast<RandomFloatExpFn>(dlsym(handle, XORSTR("RandomFloatExp")));
 	RandomInt = reinterpret_cast<RandomIntFn>(dlsym(handle, XORSTR("RandomInt")));
 	RandomGaussianFloat = reinterpret_cast<RandomGaussianFloatFn>(dlsym(handle, XORSTR("RandomGaussianFloat")));
 
 	dlclose(handle);
 }
- */
+*/
 
 void Hooker::FindOverridePostProcessingDisable()
 {
@@ -495,6 +498,7 @@ void Hooker::FindAbsFunctions()
 																							   "\xF3"),
 															 XORSTR( "xxxxxxxxxxxxxxxxxx?x????x" ) );
 }
+
 
 typedef CItemSystem* (* GetItemSystemFn)( );
 

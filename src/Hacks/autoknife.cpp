@@ -105,7 +105,7 @@ void AutoKnife::CreateMove(CUserCmd *cmd)
 
 	traceStart = localplayer->GetEyePosition();
 	traceEnd = traceStart + (traceEnd * 8192.0f);
-	
+
 	Ray_t ray;
 	ray.Init(traceStart, traceEnd);
 	CTraceFilter traceFilter;
@@ -136,7 +136,7 @@ void AutoKnife::CreateMove(CUserCmd *cmd)
 	{
 		if (itemDefinitionIndex == ItemDefinitionIndex::WEAPON_TASER)
 		{
-			if (playerDistance <= 184.f)
+			if (playerDistance <= 180.f)
 				cmd->buttons |= IN_ATTACK;
 		}
 		else

@@ -9,8 +9,6 @@
 #include "../../Utils/skins.h"
 #include "../../Hacks/skinchanger.h"
 
-#pragma GCC diagnostic ignored "-Wformat-security"
-
 void SplitSkins()
 {
 	static int modelCT = 1;
@@ -148,7 +146,7 @@ void SplitSkins()
 			|| Util::Items::IsCTWeapon(model.first)
 			|| model.first == ItemDefinitionIndex::WEAPON_KNIFE
 			|| model.first == ItemDefinitionIndex::WEAPON_KNIFE_T)
-			continue;
+    continue;
 		const bool item_selected = ((int) model.first == modelT);
 		ImGui::PushID((int) model.first);
 		if (ImGui::Selectable(Util::Items::GetItemDisplayName(model.first).c_str(), item_selected, ImGuiSelectableFlags_SpanAllColumns))
