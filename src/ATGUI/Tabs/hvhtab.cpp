@@ -164,7 +164,7 @@ void HvH::RenderTab()
             }
                 ImGui::SliderFloat(XORSTR("##DESYNC"), &Settings::AntiAim::Desync::amount, 0, 360, "Desync Offset %0.f");
                 ImGui::Separator();
-                ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced AntiAim type. \nGL HF gamers :))");
+                ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Legit/Rage AntiAim type. \nGL HF gamers :))");
                 ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
                 ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
                 ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 1, 360, "Desync Random Offset 1 %.3f");

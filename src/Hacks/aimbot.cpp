@@ -708,6 +708,7 @@ static void AutoSlow(C_BasePlayer* player, Vector& spot, float& forwardMove, flo
 
 
 
+    CreateMove::sendPacket2 = false;
     Vector unpredVel;
     Vector velocity = unpredVel;
     float speed = localplayer->GetVelocity().Length();
