@@ -148,6 +148,8 @@ public:
 	inline Vector&	operator/=(float s);
 	inline Vector&	operator+=(float fl);
 	inline Vector&	operator-=(float fl);
+	inline Vector&	operator+(float fl); //needed to add this for fastStop...but idk. need help :OooooOOOOOOOooooooOOOO
+	inline Vector&	operator-(float fl);
 	inline float	Length() const;
 	inline float LengthSqr(void) const
 	{

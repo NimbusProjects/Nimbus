@@ -230,6 +230,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 
 	settings[XORSTR("Aimbot")][XORSTR("type")] = (int) Settings::Aimbot::type;
 
+	settings[XORSTR("AntiAim")][XORSTR("Freestanding")][XORSTR("enabled")] = Settings::AntiAim::Freestanding::enabled;
 	settings[XORSTR("AntiAim")][XORSTR("enabled")] = Settings::AntiAim::enabled;
   settings[XORSTR("AntiAim")][XORSTR("type")] = (int) Settings::AntiAim::type;
   settings[XORSTR("AntiAim")][XORSTR("states")] = Settings::AntiAim::States::enabled;
@@ -847,6 +848,7 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("fakeR")], &Settings::AntiAim::fakeR);
   GetVal(settings[XORSTR("AntiAim")][XORSTR("enabled")], &Settings::AntiAim::enabled);
   GetVal(settings[XORSTR("AntiAim")][XORSTR("type")], (int*)& Settings::AntiAim::type);
+	GetVal(settings[XORSTR("AntiAim")][XORSTR("Freestanding")][XORSTR("enabled")], &Settings::AntiAim::Freestanding::enabled);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("States")][XORSTR("enabled")], &Settings::AntiAim::States::enabled);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("States")][XORSTR("Stand")][XORSTR("type")], (int*)& Settings::AntiAim::States::Stand::type);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("States")][XORSTR("Stand")][XORSTR("angle")], &Settings::AntiAim::States::Stand::angle);

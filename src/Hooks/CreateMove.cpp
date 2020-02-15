@@ -16,6 +16,7 @@
 #include "../Hacks/autoblock.h"
 #include "../Hacks/predictionsystem.h"
 #include "../Hacks/aimbot.h"
+#include "../Hacks/fastStop.h"
 #include "../Hacks/triggerbot.h"
 #include "../Hacks/autoknife.h"
 #include "../Hacks/antiaim.h"
@@ -68,6 +69,7 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 		NoFall::PostPredictionCreateMove(cmd);
 		PredictionSystem::StartPrediction(cmd);
 			Aimbot::CreateMove(cmd);
+			fastStop::CreateMove(cmd);
 			Triggerbot::CreateMove(cmd);
 			ClanTagChanger::CreateMove();
 			FakeVote::CreateMove(cmd);

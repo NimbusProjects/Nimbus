@@ -32,12 +32,12 @@ void FakeCrouch::CreateMove(CUserCmd* cmd)
     }
     counters++;
 
-    CreateMove::sendPacket = false;
+    CreateMove::sendPacket = true;
 
     if (counter)
     {
         cmd->buttons |= IN_DUCK;
-        CreateMove::sendPacket = true;
+        CreateMove::sendPacket = false;
     }
     else
         cmd->buttons &= ~IN_DUCK;

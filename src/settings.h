@@ -598,6 +598,12 @@ namespace AntiAim
         extern bool knifeHeld;
     }
 
+
+		namespace Freestanding
+		{
+			extern bool enabled;
+		}
+
 		namespace States
 		{
 			extern bool enabled;
@@ -1009,6 +1015,7 @@ namespace AntiAim
 	namespace AutoStrafe
 	{
 		extern bool enabled;
+		extern bool fastStop;
 		extern AutostrafeType type;
 		extern bool silent;
 	}

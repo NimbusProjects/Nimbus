@@ -18,7 +18,7 @@ void HvH::RenderTab()
 
 
 
-  	const char* aaType[] = {
+  	const char* resType[] = {
   		"LBY", "LBY flip", "pResolver", "Test"
   	};
 
@@ -85,7 +85,10 @@ void HvH::RenderTab()
 
             ImGui::Columns(2, nullptr, true);
             {
-				    ImGui::SliderFloat(XORSTR("##FAKELATENCYAMOUNT"), &Settings::FakeLatency::value, 1, 999, XORSTR("Fakelatency Amount: %0.f"));
+                ImGui::Separator();
+                ImGui::Checkbox(XORSTR("Freestand"), &Settings::AntiAim::Freestanding::enabled);
+                ImGui::Separator();
+				        //ImGui::SliderFloat(XORSTR("##FAKELATENCYAMOUNT"), &Settings::FakeLatency::value, 1, 999, XORSTR("Fakelatency Amount: %0.f"));
                 ImGui::Checkbox(XORSTR("Fake Lag"), &Settings::FakeLag::enabled);
                 ImGui::Checkbox(XORSTR("Fake Lag on b$end"), &Settings::FakeLag::bSend);
                 if (Settings::FakeLag::enabled)
@@ -117,13 +120,13 @@ void HvH::RenderTab()
                 ImGui::NextColumn();
                 {
                     ImGui::PushItemWidth(-1);
-                    ImGui::SliderInt(XORSTR("##STANDFAKELAGAMOUNT"), &Settings::FakeLag::States::Standing::value, 0, 24, XORSTR("Amount: %0.f"));
+                    ImGui::SliderInt(XORSTR("##STANDFAKELAGAMOUNT"), &Settings::FakeLag::States::Standing::value, 0, 16, XORSTR("Amount: %0.f"));
                     ImGui::PopItemWidth();
                     ImGui::PushItemWidth(-1);
-                    ImGui::SliderInt(XORSTR("##MOVEFAKELAGAMOUNT"), &Settings::FakeLag::States::Moving::value, 0, 24, XORSTR("Amount: %0.f"));
+                    ImGui::SliderInt(XORSTR("##MOVEFAKELAGAMOUNT"), &Settings::FakeLag::States::Moving::value, 0, 16, XORSTR("Amount: %0.f"));
                     ImGui::PopItemWidth();
                     ImGui::PushItemWidth(-1);
-                    ImGui::SliderInt(XORSTR("##INAIRFAKELAGAMOUNT"), &Settings::FakeLag::States::Air::value, 0, 14, XORSTR("Amount: %0.f"));
+                    ImGui::SliderInt(XORSTR("##INAIRFAKELAGAMOUNT"), &Settings::FakeLag::States::Air::value, 0, 16, XORSTR("Amount: %0.f"));
                     ImGui::PopItemWidth();
                 }
             }
@@ -144,8 +147,8 @@ void HvH::RenderTab()
             ImGui::Separator();
 
             ImGui::Checkbox(XORSTR("Resolve All"), &Settings::Resolver::resolveAll);
-	          if(Settings::Resolver::resolveAll == true)
-			        ImGui::Combo("Resolver Type",(int*)&Settings::Resolver::type, aaType, IM_ARRAYSIZE(aaType));
+//	          if(Settings::Resolver::resolveAll == true)
+//			        ImGui::Combo("Resolver Type",(int*)&Settings::Resolver::type, resType, IM_ARRAYSIZE(resType));
 
             ImGui::Separator();
             ImGui::Text(XORSTR("Movement"));
@@ -167,10 +170,10 @@ void HvH::RenderTab()
                 ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Legit/Rage AntiAim type. \nGL HF gamers :))");
                 ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
                 ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 1, 360, "Desync Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 1, 360, "Desync Random Offset 2 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 1, 360, "Real Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 1, 360, "Real  Random Offset 2 %.3f");
+                ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 0.1, 360, "Desync Random Offset 1 %.3f");
+                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 360, "Desync Random Offset 2 %.3f");
+                ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 0.1, 360, "Real Random Offset 1 %.3f");
+                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 360, "Real  Random Offset 2 %.3f");
 
                 ImGui::Text("!CHANGES LEGIT AA ANGLES CAN SEE ON OVERWATCH!");
                 ImGui::SliderInt(XORSTR("##FakeL"), &Settings::AntiAim::fakeL, 0, -360, "Left Fake %0.f");
