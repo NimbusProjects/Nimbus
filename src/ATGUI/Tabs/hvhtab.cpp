@@ -170,10 +170,10 @@ void HvH::RenderTab()
                 ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Legit/Rage AntiAim type. \nGL HF gamers :))");
                 ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
                 ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 0.1, 360, "Desync Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 360, "Desync Random Offset 2 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 0.1, 360, "Real Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 360, "Real  Random Offset 2 %.3f");
+                //ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 0.1, 360, "Desync Random Offset 1 %.3f");
+                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 360, "Desync Random Offset %.3f");
+                //ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 0.1, 360, "Real Random Offset 1 %.3f");
+                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 360, "Real  Random Offset %.3f");
 
                 ImGui::Text("!CHANGES LEGIT AA ANGLES CAN SEE ON OVERWATCH!");
                 ImGui::SliderInt(XORSTR("##FakeL"), &Settings::AntiAim::fakeL, 0, -360, "Left Fake %0.f");
