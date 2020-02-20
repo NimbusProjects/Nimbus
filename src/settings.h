@@ -656,6 +656,7 @@ namespace AntiAim
     namespace Resolver
     {
 	    extern bool resolveAll;
+	    extern float resolveDelt;
       extern float x;
 	    extern float y;
 	    extern int RandMax;

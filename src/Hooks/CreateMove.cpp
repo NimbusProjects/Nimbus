@@ -33,7 +33,7 @@
 #include "../Hacks/fakelatency.h"
 
 bool CreateMove::sendPacket = true;
-bool CreateMove::sendPacket2 = true;
+bool CreateMove::sendPacket2 = true; // Special thanks to tim for the second sendPacket ! give him much love xoxoxoxo
 bool bSend;
 QAngle CreateMove::lastTickViewAngles = QAngle(0, 0, 0);
 
@@ -92,6 +92,8 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
         if (CreateMove::sendPacket) {
             CreateMove::lastTickViewAngles = cmd->viewangles;
         }
+
+
 	}
 
 	return false;

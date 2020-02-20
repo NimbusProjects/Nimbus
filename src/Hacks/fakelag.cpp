@@ -29,28 +29,33 @@ int ticksMax = 16;
 
 void FakeLag::CreateMove(CUserCmd* cmd, bool bSend)
 {
-  	if (!engine->IsInGame())
-		return;
 
-	if (!Settings::FakeLag::enabled)
-		return;
+
+  if (!Settings::FakeLag::enabled)
+    return;
 
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+
 	if (!localplayer || !localplayer->GetAlive())
 		return;
 
-  if(Settings::FakeLag::lagSpike && localplayer->GetVelocity().Length() > 0.1f && localplayer->GetVelocity().Length() < 125.0f && (localplayer->GetFlags() & FL_ONGROUND))
-  {
-    CreateMove::sendPacket2 = false; //<insert funny emoji here>
+
+   if(Settings::FakeLag::lagSpike && localplayer->GetVelocity().Length() >= 1.0f &&  localplayer->GetVelocity().Length() <= 130.0f && (localplayer->GetFlags() & FL_ONGROUND))
+   {
+		CreateMove::sendPacket2 = ticks < 16 - 1;
+    return;
   }
 
-/*
-  if (cmd->buttons & IN_ATTACK)
-	{
-    bSend = false;
-		CreateMove::sendPacket2 = true;
-	}
-*/
+
+
+    static bool attack = false;
+
+  	if (cmd->buttons & IN_ATTACK && !attack)
+	  {
+		  CreateMove::sendPacket2 = ticks < 16 - 16;
+      attack = !attack;
+		  return;
+	  }
 
 
 	if (ticks >= ticksMax)
@@ -64,14 +69,14 @@ void FakeLag::CreateMove(CUserCmd* cmd, bool bSend)
 	{
 		if (Settings::FakeLag::States::Air::enabled && !(localplayer->GetFlags() & FL_ONGROUND))
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Air::value;
-		else if (Settings::FakeLag::States::Moving::enabled && localplayer->GetVelocity().Length() > 0.1f)
+		else if (Settings::FakeLag::States::Moving::enabled && localplayer->GetVelocity().Length() >= 145.f)
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Moving::value;
-		else if (Settings::FakeLag::States::Standing::enabled)
+		else if(Settings::FakeLag::States::Standing::enabled)
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Standing::value;
 	}
 	else
 		CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::value;
 
 	ticks++;
+  }
 
-}

@@ -8,6 +8,7 @@
 #include "antiaim.h"
 
 bool Settings::Resolver::resolveAll = false;
+float Settings::Resolver::resolveDelt = 0.5f;
 std::vector<int64_t> Resolver::Players = { };
 
 std::vector<std::pair<C_BasePlayer*, QAngle>> player_data;
@@ -15,22 +16,24 @@ std::vector<std::pair<C_BasePlayer*, QAngle>> player_data;
 // New resolver (by Skerei, updated by Zede)
 static void Resolve(C_BasePlayer* player, float feetYaw, float angleYaw, float maxDelta)
 {
-	if (player->GetVelocity().Length() > 75.77f)
-	{
-		player->GetEyeAngles()->y = *player->GetLowerBodyYawTarget();
-		player->GetAnimState()->goalFeetYaw = (180.f + (angleYaw - feetYaw)) / 360.f;
-		Math::NormalizeYaw(player->GetEyeAngles()->y);
 
-		angleYaw = (rand() % 2) ? angleYaw + (maxDelta / 2.2f) : angleYaw - (maxDelta / 2.2f);
-	}
-	else if (player->GetVelocity().Length() < 75.77f)
-	{
-		player->GetAnimState()->goalFeetYaw = (180.f + (angleYaw - feetYaw)) / 360.f;
+if (player->GetVelocity().Length() > 75.77f)
+    {
+        player->GetEyeAngles()->y = *player->GetLowerBodyYawTarget();
+        player->GetAnimState()->goalFeetYaw = (180.f + (angleYaw - feetYaw)) / 360.f;
+        Math::NormalizeYaw(player->GetEyeAngles()->y);
 
-		if (feetYaw <= -maxDelta & feetYaw < 0)
-			player->GetEyeAngles()->y += (maxDelta / angleYaw);
-		else if (feetYaw <= maxDelta & feetYaw > 0)
-			player->GetEyeAngles()->y -= (maxDelta / angleYaw);
+        angleYaw = player->GetEyeAngles() ? angleYaw - (maxDelta / 2.2f) : angleYaw + (maxDelta / 2.2f); //rand? no. get the player eyeAngles
+    }
+    else if (player->GetVelocity().Length() < 75.77f)
+    {
+        player->GetEyeAngles()->y = *player->GetLowerBodyYawTarget();
+        player->GetAnimState()->goalFeetYaw = (180.f + (angleYaw - feetYaw)) / 360.f;
+        Math::NormalizeYaw(player->GetEyeAngles()->y);
+        if (feetYaw >= -maxDelta & feetYaw < 0)
+            player->GetAnimState()->goalFeetYaw -= maxDelta * Settings::Resolver::resolveDelt;
+        else if (feetYaw <= maxDelta & feetYaw > 0)
+            player->GetAnimState()->goalFeetYaw += maxDelta * Settings::Resolver::resolveDelt;
 
 		CUtlVector<AnimationLayer> *layers = player->GetAnimOverlay();
 
@@ -40,7 +43,7 @@ static void Resolve(C_BasePlayer* player, float feetYaw, float angleYaw, float m
 
 			if (m_flPlaybackRate > 0.1f)
 			{
-				for (float resolveDelta = 0.0f; resolveDelta < -maxDelta || resolveDelta > maxDelta; resolveDelta = resolveDelta / 2.2f)
+				for (float resolveDelta = 0.0f; resolveDelta < -maxDelta * Settings::Resolver::resolveDelt || resolveDelta > maxDelta * Settings::Resolver::resolveDelt; resolveDelta = resolveDelta / 2.2f)
 					player->GetEyeAngles()->y = resolveDelta;
 			}
 		}

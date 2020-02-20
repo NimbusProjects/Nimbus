@@ -603,7 +603,7 @@ void Aimbot::RenderTab()
 			ImGui::NextColumn();
 			{
 				ImGui::PushItemWidth(-1);
-				if (ImGui::SliderFloat(XORSTR("##SMOOTH"), &smoothValue, 0, 1))
+				if (ImGui::SliderFloat(XORSTR("##SMOOTH"), &smoothValue, 0, 2))
 					UI::UpdateWeaponSettings();
 				if (ImGui::SliderFloat(XORSTR("##SALT"), &smoothSaltMultiplier, 0, smoothValue))
 					UI::UpdateWeaponSettings();

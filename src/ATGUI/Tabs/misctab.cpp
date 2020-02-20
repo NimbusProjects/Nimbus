@@ -209,12 +209,11 @@ void Misc::RenderTab()
 			ImGui::Columns(2, nullptr, true);
 			{
 
-				ImGui::Checkbox(XORSTR("Bypass SvCheats?"), &Settings::SvCheats::enabled);
+				ImGui::Checkbox(XORSTR("Force SvCheats"), &Settings::SvCheats::enabled);
         if(Settings::SvCheats::enabled){
-				  ImGui::Checkbox(XORSTR("Control Gravity?"), &Settings::SvCheats::gravity::enabled);
-				  ImGui::Checkbox(XORSTR("Viewmodel Memes?"), &Settings::SvCheats::viewmodel::enabled);
+				  ImGui::Checkbox(XORSTR("Ragdoll Override"), &Settings::SvCheats::gravity::enabled);
+				  ImGui::Checkbox(XORSTR("Viewmodel OVerride"), &Settings::SvCheats::viewmodel::enabled);
         }
-				//ImGui::Checkbox(XORSTR("Viewmodel FOV"), &Settings::FOVChanger::viewmodelEnabled);
 				ImGui::Checkbox(XORSTR("FOV"), &Settings::FOVChanger::enabled);
 				ImGui::Checkbox(XORSTR("Ignore Scope"), &Settings::FOVChanger::ignoreScope);
 			}
@@ -230,9 +229,9 @@ void Misc::RenderTab()
 
         if(Settings::SvCheats::viewmodel::enabled){
 				ImGui::SliderFloat(XORSTR("##VIEWMODELFOV"), &Settings::SvCheats::viewmodel::fov, -240, 240, "VIEWFOV: %.3f");
-				ImGui::SliderFloat(XORSTR("##VIEWMODELX"), &Settings::SvCheats::viewmodel::x, -30, 30, "VIEWX: %.3f");
-				ImGui::SliderFloat(XORSTR("##VIEWMODELY"), &Settings::SvCheats::viewmodel::y, -30, 30, "VIEWY: %.3f");
-				ImGui::SliderFloat(XORSTR("##VIEWMODELZ"), &Settings::SvCheats::viewmodel::z, -30, 30, "VIEWZ: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELX"), &Settings::SvCheats::viewmodel::x, -90, 90, "VIEWX: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELY"), &Settings::SvCheats::viewmodel::y, -90, 90, "VIEWY: %.3f");
+				ImGui::SliderFloat(XORSTR("##VIEWMODELZ"), &Settings::SvCheats::viewmodel::z, -90, 90, "VIEWZ: %.3f");
         }
 
 

@@ -15,7 +15,7 @@ void RemoveInvalidTicks() {
   const auto ticks =
       ((Settings::BackTrack::time > 0) && (Settings::BackTrack::time < 40))
           ? Settings::BackTrack::time
-          : 13;
+          : 24;
   // TODO: xd
   using namespace BackTrack;
   for (auto it = backtrack_frames.begin(); it != backtrack_frames.end(); it++) {

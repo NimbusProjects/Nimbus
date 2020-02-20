@@ -24,5 +24,5 @@ void FakeWalk::CreateMove(CUserCmd* cmd)
     choked = choked > 3 ? 0 : choked + 1;
     cmd->forwardmove = choked < 1 || choked > 2 ? 0 : cmd->forwardmove;
     cmd->sidemove = choked < 1 || choked > 2 ? 0 : cmd->sidemove;
-    CreateMove::sendPacket2 = choked < 1;
+    CreateMove::sendPacket = choked < 1;
 }

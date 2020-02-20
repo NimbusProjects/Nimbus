@@ -261,6 +261,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
   settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")] = Settings::AntiAim::Desync::interval;
 
 	settings[XORSTR("Resolver")][XORSTR("resolve_all")] = Settings::Resolver::resolveAll;
+	settings[XORSTR("Resolver")][XORSTR("resolveDelt")] = Settings::Resolver::resolveDelt;
 
     settings[XORSTR("AngleIndicator")][XORSTR("enabled")] = Settings::AngleIndicator::enabled;
 
@@ -864,6 +865,7 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("custom")], &Settings::AntiAim::LBYBreaker::custom);
 
 	GetVal(settings[XORSTR("Resolver")][XORSTR("resolve_all")], &Settings::Resolver::resolveAll);
+	GetVal(settings[XORSTR("Resolver")][XORSTR("resolveDelt")], &Settings::Resolver::resolveDelt);
 
     GetVal(settings[XORSTR("AngleIndicator")][XORSTR("enabled")], &Settings::AngleIndicator::enabled);
 

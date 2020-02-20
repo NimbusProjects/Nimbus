@@ -708,7 +708,7 @@ static void AutoSlow(C_BasePlayer* player, Vector& spot, float& forwardMove, flo
 
 
 
-    CreateMove::sendPacket2 = false;
+    CreateMove::sendPacket = false;
     Vector unpredVel;
     Vector velocity = unpredVel;
     float speed = localplayer->GetVelocity().Length();
@@ -745,7 +745,7 @@ static void AutoCock(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CUs
         return;
 
     cmd->buttons |= IN_ATTACK;
-    float postponeFireReadyTime = activeWeapon->GetPostPoneReadyTime();
+    float postponeFireReadyTime = activeWeapon->GetPostPoneReadyTime(); //just a test...
     if (postponeFireReadyTime-20 > 0)
     {
         if (postponeFireReadyTime-5 < globalVars->curtime)

@@ -130,11 +130,9 @@ void HvH::RenderTab()
                     ImGui::PopItemWidth();
                 }
             }
-/* idk why this is even where lol
                if (Settings::AntiAim::type == AntiAimType::CUSTOM || !Settings::AntiAim::States::enabled) {
                 ImGui::Separator();
-                ImGui::SliderFloat(XORSTR("Yaw Angle"), &Settings::AntiAim::yaw, 0, 360, "Yaw angle %1.0f");
-            }*/
+
             ImGui::Checkbox(XORSTR("Desync Swap Status"), &Settings::AntiAim::swap);
             ImGui::EndChild();
         }
@@ -143,10 +141,13 @@ void HvH::RenderTab()
     {
         ImGui::BeginChild(XORSTR("HVH2"), ImVec2(0, 0), true);
         {
+
             ImGui::Text(XORSTR("Resolver"));
+            ImGui::Checkbox(XORSTR("Resolve All"), &Settings::Resolver::resolveAll);
+            if(Settings::Resolver::resolveAll)
+            ImGui::SliderFloat(XORSTR("##DELT"), &Settings::Resolver::resolveDelt, 0, 1, "Resolver Delta %.2f");
             ImGui::Separator();
 
-            ImGui::Checkbox(XORSTR("Resolve All"), &Settings::Resolver::resolveAll);
 //	          if(Settings::Resolver::resolveAll == true)
 //			        ImGui::Combo("Resolver Type",(int*)&Settings::Resolver::type, resType, IM_ARRAYSIZE(resType));
 
@@ -167,14 +168,16 @@ void HvH::RenderTab()
             }
                 ImGui::SliderFloat(XORSTR("##DESYNC"), &Settings::AntiAim::Desync::amount, 0, 360, "Desync Offset %0.f");
                 ImGui::Separator();
-                ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Legit/Rage AntiAim type. \nGL HF gamers :))");
-                ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
-                ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
+                ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Rage AntiAim type. \nGL HF gamers :))");
+                //ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
+                //ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
                 //ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 0.1, 360, "Desync Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 360, "Desync Random Offset %.3f");
+                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 56, "Desync Random Offset %.3f");
                 //ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 0.1, 360, "Real Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 360, "Real  Random Offset %.3f");
+                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 56, "Real  Random Offset %.3f");
 
+                ImGui::Separator();
+                ImGui::Text("Not implemented yet...");
                 ImGui::Text("!CHANGES LEGIT AA ANGLES CAN SEE ON OVERWATCH!");
                 ImGui::SliderInt(XORSTR("##FakeL"), &Settings::AntiAim::fakeL, 0, -360, "Left Fake %0.f");
                 ImGui::SliderInt(XORSTR("##FakeR"), &Settings::AntiAim::fakeR, 0, 360, "Right Fake %0.f");
@@ -186,11 +189,12 @@ void HvH::RenderTab()
             {
         ImGui::Checkbox(XORSTR("BackTrack Chams Enabled"), &Settings::BackTrack::Chams::enabled);
 				ImGui::Checkbox(XORSTR("BackTrack Draw Last Only"), &Settings::BackTrack::Chams::drawlastonly);
-				ImGui::SliderInt(XORSTR("##LAGCOMP"), &Settings::BackTrack::time, 10.f, 16.f, XORSTR("LagComp: %0.2f TICKS"));
+				ImGui::SliderInt(XORSTR("##LAGCOMP"), &Settings::BackTrack::time, 2.f, 24.f, XORSTR("LagComp: %0.2f TICKS"));
 				ImGui::SliderFloat(XORSTR("##LAGCOMPFOV"), &Settings::BackTrack::fov, 1.f, 180.f, XORSTR("LagComp FOV: %0.2f"));
 
             }
         }
             ImGui::EndChild();
     }
+}
 }

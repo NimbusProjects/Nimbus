@@ -111,7 +111,8 @@ void Hooks::DrawModelExecute(void* thisptr, void* context, void* state,
         Settings::ThirdPerson::type == ShowedAngle::BOTH) {
 
       matrix3x4_t custom_bones[MAXSTUDIOBONES];
-      QAngle fake_angle = AntiAim::calculatedDesyncAngle;
+      //QAngle fake_angle = AntiAim::calculatedDesyncAngle;
+      QAngle fake_angle = CreateMove::lastTickViewAngles;
 
       Math::NormalizeAngles(fake_angle);
       matrix3x4_t rotation_matrix;

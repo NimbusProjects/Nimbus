@@ -2,6 +2,7 @@
 
 #include "../interfaces.h"
 #include "../settings.h"
+#include "../Utils/xorstring.h"
 
 bool Settings::SvCheats::enabled = false;
 bool Settings::SvCheats::gravity::enabled = false;
@@ -12,17 +13,6 @@ float Settings::SvCheats::viewmodel::x = 1;
 float Settings::SvCheats::viewmodel::y = 1;
 float Settings::SvCheats::viewmodel::z = 1;
 
-void SvCheats::MiniSpec(const char* sv_competitive_minispec)
-{
-/*
-	ConVar* minispec = cvar->FindVar("sv_competitive_minispec");
-  minispec->fnChangeCallback = 0;
-  minispec->flags &= ~FCVAR_CHEAT;
-	minispec->SetValue(sv_competitive_minispec);
-  return;
-*/
-}
-
 void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 {
 	if (!Settings::SvCheats::enabled)
@@ -31,11 +21,8 @@ void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 	if (!engine->IsInGame())
         return;
 
-//  if(Settings::SvCheats::enabled)
-//    SvCheats::MiniSpec(0);
 
-
-  //if(Settings::SvCheats::nospread::enabled){
+  //if(Settings::SvCheats::nospread::enabled){ //meme
  // }
 
   if(Settings::SvCheats::gravity::enabled){
@@ -47,16 +34,25 @@ void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 	  invertedragdoll->flags &= ~FCVAR_CHEAT;
 	  invertedragdoll->SetValue(800);
   }
+
+  if(Settings::SvCheats::viewmodel::enabled){
+   static	ConVar* minspec = cvar->FindVar(XORSTR("sv_competitive_minspec"));
+   minspec->fnChangeCallback = 0;
+   minspec->SetValue(0);
+  }else{
+   static	ConVar* minspec = cvar->FindVar(XORSTR("sv_competitive_minspec"));
+   minspec->fnChangeCallback = 0;
+   minspec->SetValue(1);
+  }
   if(Settings::SvCheats::viewmodel::enabled){
 	  static ConVar* viewmodelfov = cvar->FindVar("viewmodel_fov");
 	  static ConVar* viewmodelx = cvar->FindVar("viewmodel_offset_x");
 	  static ConVar* viewmodely = cvar->FindVar("viewmodel_offset_y");
 	  static ConVar* viewmodelz = cvar->FindVar("viewmodel_offset_z");
-    static ConVar* minispec = cvar->FindVar("sv_cheats");
+    static ConVar* svcheats = cvar->FindVar("sv_cheats");
 
 
-
-    minispec->flags &= ~FCVAR_CHEAT;
+    svcheats->flags &= ~FCVAR_CHEAT;
     viewmodelfov->flags &= ~FCVAR_CHEAT;
 	  viewmodelx->flags &= ~FCVAR_CHEAT;
 	  viewmodely->flags &= ~FCVAR_CHEAT;
@@ -66,7 +62,7 @@ void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
     viewmodelx->SetValue(Settings::SvCheats::viewmodel::x);
     viewmodely->SetValue(Settings::SvCheats::viewmodel::y);
     viewmodelz->SetValue(Settings::SvCheats::viewmodel::z);
-    minispec->SetValue(1);
+    svcheats->SetValue(1);
   }
 
 
