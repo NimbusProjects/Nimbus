@@ -4,7 +4,10 @@
 #include "../settings.h"
 #include "../Utils/xorstring.h"
 
+bool Settings::SvCheats::bright::enabled = false;
+bool Settings::SvCheats::fog::enabled = false;
 bool Settings::SvCheats::enabled = false;
+bool Settings::SvCheats::aspect::enabled = false;
 bool Settings::SvCheats::gravity::enabled = false;
 int Settings::SvCheats::gravity::amount = 800;
 bool Settings::SvCheats::viewmodel::enabled = false;
@@ -12,6 +15,7 @@ float Settings::SvCheats::viewmodel::fov = 68;
 float Settings::SvCheats::viewmodel::x = 1;
 float Settings::SvCheats::viewmodel::y = 1;
 float Settings::SvCheats::viewmodel::z = 1;
+float Settings::SvCheats::aspect::var = 1;
 
 void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 {
@@ -21,6 +25,14 @@ void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 	if (!engine->IsInGame())
         return;
 
+  static ConVar* svcheats = cvar->FindVar("sv_cheats");
+  svcheats->SetValue(1);
+
+  static ConVar* fullbright = cvar->FindVar("mat_fullbright");
+  static ConVar* fogoverride = cvar->FindVar("fog_override");
+
+  fullbright->SetValue(Settings::SvCheats::bright::enabled);
+  fogoverride->SetValue(Settings::SvCheats::fog::enabled);
 
   //if(Settings::SvCheats::nospread::enabled){ //meme
  // }
@@ -49,20 +61,17 @@ void SvCheats::FrameStageNotify(ClientFrameStage_t stage)
 	  static ConVar* viewmodelx = cvar->FindVar("viewmodel_offset_x");
 	  static ConVar* viewmodely = cvar->FindVar("viewmodel_offset_y");
 	  static ConVar* viewmodelz = cvar->FindVar("viewmodel_offset_z");
-    static ConVar* svcheats = cvar->FindVar("sv_cheats");
-
-
-    svcheats->flags &= ~FCVAR_CHEAT;
-    viewmodelfov->flags &= ~FCVAR_CHEAT;
-	  viewmodelx->flags &= ~FCVAR_CHEAT;
-	  viewmodely->flags &= ~FCVAR_CHEAT;
-	  viewmodelz->flags &= ~FCVAR_CHEAT;
+    static ConVar* aspect = cvar->FindVar("r_aspectratio");
+    float ratio = (Settings::SvCheats::aspect::var * 0.1) / 2;
 
     viewmodelfov->SetValue(Settings::SvCheats::viewmodel::fov);
     viewmodelx->SetValue(Settings::SvCheats::viewmodel::x);
     viewmodely->SetValue(Settings::SvCheats::viewmodel::y);
     viewmodelz->SetValue(Settings::SvCheats::viewmodel::z);
-    svcheats->SetValue(1);
+    if(ratio > 0.001)
+    aspect->SetValue(ratio);
+    else
+    aspect->SetValue((35 * 0.1f) / 2);
   }
 
 

@@ -4,6 +4,7 @@
 #include "fakelag.h"
 
 #include "../Utils/xorstring.h"
+#include "../SDK/INetChannel.h"
 #include "../Utils/math.h"
 #include "../Utils/entity.h"
 #include "../Utils/bonemaps.h"
@@ -27,7 +28,7 @@ bool Settings::Aimbot::ErrorMargin::enabled = false;
 float Settings::Aimbot::ErrorMargin::value = 0.0f;
 bool Settings::Aimbot::AutoAim::enabled = false;
 float Settings::Aimbot::AutoAim::fov = 180.0f;
-float Settings::Aimbot::AutoAim::HeadMultiPoint = 0.6f;
+float Settings::Aimbot::AutoAim::HeadMultiPoint = 0.75f;
 bool Settings::Aimbot::AutoAim::realDistance = false;
 bool Settings::Aimbot::AutoAim::closestBone = false;
 bool Settings::Aimbot::AutoAim::desiredBones[] = {true, true, true, true, true, true, true, // center mass
@@ -71,12 +72,16 @@ bool Aimbot::aimStepInProgress = false;
 std::vector<int64_t> Aimbot::friends = { };
 std::vector<long> killTimes = { 0 }; // the Epoch time from when we kill someone
 
+Vector prePredVel;
+Vector preEyePos;
 bool shouldAim;
 QAngle AimStepLastAngle;
 QAngle RCSLastPunch;
 
 int Aimbot::targetAimbot = -1;
 const int headVectors = 11;
+
+static INetChannel* NetInf = nullptr;
 
 std::unordered_map<ItemDefinitionIndex, AimbotWeapon_t, Util::IntHash<ItemDefinitionIndex>> Settings::Aimbot::weapons = {
 		{ ItemDefinitionIndex::INVALID, defaultSettings },
@@ -135,6 +140,9 @@ static bool HeadMultiPoint(C_BasePlayer *player, Vector points[])
 
 	return true;
 }
+
+
+
 static float AutoWallBestSpot(C_BasePlayer *player, Vector &bestSpot)
 {
 	float bestDamage = Settings::Aimbot::AutoWall::value;
@@ -214,9 +222,10 @@ static float GetRealDistanceFOV(float distance, QAngle angle, CUserCmd* cmd)
 	return aimingAt.DistTo(aimAt);
 }
 
-static Vector VelocityExtrapolate(C_BasePlayer* player, Vector aimPos)
+//static Vector VelocityExtrapolate(C_BasePlayer* player, Vector aimPos)
+static Vector VelocityExtrapolate(C_BasePlayer* player, int value)
 {
-	return aimPos + (player->GetVelocity() * globalVars->interval_per_tick);
+	return player->GetAbsOrigin() +  (player->GetVelocity() * globalVars->interval_per_tick * value);
 }
 
 /* Original Credits to: https://github.com/goldenguy00 ( study! study! study! :^) ) */
@@ -611,7 +620,7 @@ static void AutoCrouch(C_BasePlayer* player, CUserCmd* cmd)
 	cmd->buttons |= IN_BULLRUSH | IN_DUCK;
 }
 
-static void LagSpike(C_BasePlayer* player, CUserCmd* cmd)
+/*static void LagSpike(C_BasePlayer* player, CUserCmd* cmd)
 {
 	if (!Settings::FakeLag::lagSpike)
 		return;
@@ -624,7 +633,7 @@ static void LagSpike(C_BasePlayer* player, CUserCmd* cmd)
 
 	FakeLag::lagSpike = true;
 }
-
+*/
 /*
 static void AutoSlow(C_BasePlayer* player, float& forward, float& sideMove, float& bestDamage, C_BaseCombatWeapon* active_weapon, CUserCmd* cmd)
 {
@@ -708,7 +717,7 @@ static void AutoSlow(C_BasePlayer* player, Vector& spot, float& forwardMove, flo
 
 
 
-    CreateMove::sendPacket = false;
+
     Vector unpredVel;
     Vector velocity = unpredVel;
     float speed = localplayer->GetVelocity().Length();
@@ -719,13 +728,26 @@ static void AutoSlow(C_BasePlayer* player, Vector& spot, float& forwardMove, flo
     Vector forward;
     Math::AngleVectors(direction, forward);
 
-    auto negated_direction = forward * -speed;
 
-    float factor = std::max(negated_direction.x, negated_direction.y) / 450.f;
+    auto negated_direction = (forward -= 0.217812)* -speed;
+
+    float factor = std::max(negated_direction.x, negated_direction.y) / 450;
     negated_direction *= factor;
-
+	if( Settings::Aimbot::SpreadLimit::enabled )
+	{
+		if( (activeWeapon->GetSpread() + activeWeapon->GetInaccuracy()) > Settings::Aimbot::SpreadLimit::value ){
     forwardMove = negated_direction.x;
     sideMove = negated_direction.y;
+
+
+    }
+  	else if( localplayer->GetVelocity().Length() > (activeWeapon->GetCSWpnData()->GetMaxPlayerSpeed() / 3) )
+	  {
+      forwardMove = negated_direction.x;
+      sideMove = negated_direction.y;
+
+	  }
+  }
 }
 
 static void AutoCock(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CUserCmd* cmd)
@@ -843,6 +865,15 @@ static void FixMouseDeltas(CUserCmd* cmd, const QAngle &angle, const QAngle &old
     cmd->mousedx = -delta.y / ( m_yaw * sens * zoomMultiplier );
     cmd->mousedy = delta.x / ( m_pitch * sens * zoomMultiplier );
 }
+
+void Aimbot::PrePredictionCreateMove(CUserCmd* cmd)
+{
+		//C_BasePlayer* player;
+    //preEyePos = player->GetEyePosition();
+    C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+    prePredVel = localplayer->GetVelocity();
+}
+
 void Aimbot::CreateMove(CUserCmd* cmd)
 {
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
@@ -908,9 +939,17 @@ void Aimbot::CreateMove(CUserCmd* cmd)
 			{
 				if (Settings::Aimbot::Prediction::enabled)
 				{
-					localEye = VelocityExtrapolate(localplayer, localEye); // get eye pos next tick
-					bestSpot = VelocityExtrapolate(player, bestSpot); // get target pos next tick
-				}
+          //Shoot first, ask questions later.
+          newTarget = true;
+	        Vector head = player->GetBonePosition((int)BONE_HEAD);
+					localEye = VelocityExtrapolate(localplayer, TIME_TO_TICKS(NetInf->GetAvgLatency(FLOW_INCOMING) + NetInf->GetAvgLatency(FLOW_OUTGOING))); // get target pos next tick
+					bestSpot = VelocityExtrapolate(player, TIME_TO_TICKS(NetInf->GetAvgLatency(FLOW_INCOMING) + NetInf->GetAvgLatency(FLOW_OUTGOING))); // get target pos next tick
+        head = VelocityExtrapolate(player, TIME_TO_TICKS(NetInf->GetAvgLatency(FLOW_INCOMING) + NetInf->GetAvgLatency(FLOW_OUTGOING)));
+  			//cmd->tick_count = tick.tickcount;
+        globalVars->tickcount = TIME_TO_TICKS(NetInf->GetAvgLatency(FLOW_INCOMING) + NetInf->GetAvgLatency(FLOW_OUTGOING));
+			  cmd->tick_count = globalVars->tickcount;
+        //Just letting y'all know, this DOES work, but you need to be in an actual game to see how well it works. I've  tested it a bunch and people have reported that i shoot as soon as they peek on their screen, which is good!
+        }
 				angle = Math::CalcAngle(localEye, bestSpot);
 
 				if (Settings::Aimbot::ErrorMargin::enabled)
@@ -936,7 +975,7 @@ void Aimbot::CreateMove(CUserCmd* cmd)
     AimStep(player, angle, cmd);
 	//Backtrack(localplayer, player, cmd);
 	AutoCrouch(player, cmd);
-  LagSpike(player, cmd);
+  //LagSpike(player, cmd);
 	//AutoSlow(player, oldForward, oldSideMove, bestDamage, activeWeapon, cmd);
   AutoSlow(player, bestSpot, oldForward, oldSideMove, activeWeapon, cmd);
 	AutoPistol(activeWeapon, cmd);

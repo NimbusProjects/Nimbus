@@ -16,7 +16,7 @@ void RemoveInvalidTicks() {
       ((Settings::BackTrack::time > 0) && (Settings::BackTrack::time < 40))
           ? Settings::BackTrack::time
           : 24;
-  // TODO: xd
+
   using namespace BackTrack;
   for (auto it = backtrack_frames.begin(); it != backtrack_frames.end(); it++) {
 
@@ -36,7 +36,6 @@ void RegisterTicks() {
   for (int i = 1; i < engine->GetMaxClients(); ++i) {
     const auto player = (C_BasePlayer*)entityList->GetClientEntity(i);
 
-    // skip if player is not alive or other shit
     if (!player || player == local_player || player->GetDormant() ||
         !player->GetAlive() || Entity::IsTeamMate(player, local_player) ||
         player->GetImmune())

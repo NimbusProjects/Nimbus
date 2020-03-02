@@ -24,6 +24,7 @@ public:
 		unsigned char filesdownloaded;
 	} player_info_t;
 
+
 	void GetScreenSize(int& width, int& height)
 	{
 		typedef void (* oGetScreenSize)(void*, int&, int&);

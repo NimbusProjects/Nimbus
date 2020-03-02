@@ -1,19 +1,27 @@
-You *can* tap skeet/ot if you configure this properly.
-Legit AA is pretty op btw. Careful changing settings on it though.
+Update: Shoot first, ask questions later.
+
+-> Set Backtrack/LagComp to max of 16.00 Ticks, still trying to figure out how to go above that with some fakelatency sync or something... (b1g concepts)
+-> Legit AA WORKS
+-> Resolver HITS. (Still in beta)
+-> ForwardTracking replaces Prediction.
+-> ForwardTracking DOES REQUIRE YOU TO HAVE SOME PING! Net_fakelag isn't as accurate as real lag either! This does fix a lot of the problems with the cheat not hitting anything when people are moving quickly.
+-> I didn't track the majority of the changes I made, but I'm gonna try to start keeping track of them in the next update. GL HF !
+
 
 -- Coming up next:
-  -> Better FakeDuck.
-  -> BackTrack Chams Fix.
+  -> BackTrack on Aimbot. (lol... op)
+  -> Better FakeDuck. (aha, funny)
+  -> BackTrack Chams Fix. (Nah, this will take awhile)
   -> FakeLatency.
-  -> FakeAngle + FakeLag chams(if that's even useful lmao).
-  -> Zeus/Knife Radius Crash Fix on join game.
-  -> Tweaks to Resolver. (even tho it already be hitting p LMAO)
-  -> Movement keys display.
+  -> FakeAngle + FakeLag chams(it WORKS now, i just need to figure out how to get the real angle data, thirdperson fix might have to come first).
+  -> Zeus/Knife Radius Crash Fix on join game. (wait, i forgot this...)
+  -> Tweaks to Resolver. (i've been tapping OTC, Skeet, and Aimware V5 over the last few days, big shoutout to the HvH community + friends for helping me grab resolver data in private matches!)
+  -> Movement keys display. (for you movement junkies)
   -> A lot more stuff.
   -> Some more thicc exploits.
-  -> FakeLag on FakeDuck.
+  -> FakeLag on FakeDuck. (this is a meme, dw)
   -> Accuracy scope thing.
-  -> GodMODE!?!?! (OWO)
+  -> GodMODE!?!?! (OWO) (pAA??????)
   -> Viewmodel Aimbot.
   -> This ye olde SmartAA concept i had awhile ago. (Something dealing with
   switching angles after someone shoots to a random position OwO).

@@ -7,6 +7,7 @@
 #include "../Hacks/noflash.h"
 #include "../Hacks/view.h"
 #include "../Hacks/resolver.h"
+#include "../Hacks/animFix.h"
 #include "../Hacks/lagcomp.h"
 #include "../Hacks/skybox.h"
 #include "../Hacks/asuswalls.h"
@@ -26,6 +27,7 @@ void Hooks::FrameStageNotify(void* thisptr, ClientFrameStage_t stage)
 	Noflash::FrameStageNotify(stage);
 	View::FrameStageNotify(stage);
 	Resolver::FrameStageNotify(stage);
+  animFix::FrameStageNotify(stage);
 	SkyBox::FrameStageNotify(stage);
 	ASUSWalls::FrameStageNotify(stage);
 	NoSmoke::FrameStageNotify(stage);
@@ -42,6 +44,7 @@ void Hooks::FrameStageNotify(void* thisptr, ClientFrameStage_t stage)
 
 	clientVMT->GetOriginalMethod<FrameStageNotifyFn>(37)(thisptr, stage);
 
+  animFix::PostFrameStageNotify(stage);
 	Resolver::PostFrameStageNotify(stage);
 	View::PostFrameStageNotify(stage);
 }

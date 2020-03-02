@@ -21,8 +21,8 @@ void FakeWalk::CreateMove(CUserCmd* cmd)
     if (!inputSystem->IsButtonDown(Settings::FakeWalk::key))
         return;
 
-    choked = choked > 3 ? 0 : choked + 1;
-    cmd->forwardmove = choked < 1 || choked > 2 ? 0 : cmd->forwardmove;
-    cmd->sidemove = choked < 1 || choked > 2 ? 0 : cmd->sidemove;
+    choked = choked > 7 ? 0 : choked + 1;
+    cmd->forwardmove = choked < 2 || choked > 5 ? 0 : cmd->forwardmove;
+    cmd->sidemove = choked < 2 || choked > 5 ? 0 : cmd->sidemove;
     CreateMove::sendPacket = choked < 1;
 }

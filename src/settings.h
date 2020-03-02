@@ -174,6 +174,10 @@ enum class AntiAimType: int
 	RAGE,
 	LEGIT,
   DUMP,
+  GHETTO,
+  SCRIM,
+  RUBY,
+  CROOKED,
   CUSTOM,
   FREESTAND,
 };
@@ -224,7 +228,7 @@ struct AimbotWeapon_t
 		  rcsAmountY = 2.0f,
 		  autoWallValue = 10.0f,
 		  spreadLimit = 1.0f,
-		  HeadMultiPoint = 0.6f,
+		  HeadMultiPoint = 0.4f,
 		  hitChance = 80.0f;
 	bool desiredBones[31];
 
@@ -587,6 +591,8 @@ namespace AntiAim
     extern float off2;
     extern float roff1;
     extern float roff2;
+    extern float loff1;
+    extern float loff2;
     extern int fakeL;
     extern int fakeR;
     extern bool swap;
@@ -639,6 +645,12 @@ namespace AntiAim
       extern float time;
       extern float interval;
     }
+
+
+  namespace HeadEdge
+  {
+    extern float distance;
+  }
 
 	namespace LBYBreaker
 	{
@@ -1081,6 +1093,29 @@ namespace AntiAim
 		extern ButtonCode_t key;
 	}
 
+	namespace TickOnShoot
+	{
+		extern bool enabled;
+//		extern ButtonCode_t key;
+	}
+
+	namespace TickOnKey
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
+
+
+	namespace TickManip
+  {
+		extern bool enabled;
+  }
+
+	namespace TickOnChoke
+	{
+		extern bool enabled;
+	}
+
 	namespace Autoblock
 	{
 		extern bool enabled;
@@ -1292,6 +1327,24 @@ namespace AntiAim
         extern bool enabled;
         extern int amount;
     }
+
+    namespace aspect
+    {
+      extern bool enabled;
+      extern float var;
+    }
+
+   namespace bright
+    {
+      extern bool enabled;
+    }
+
+   namespace fog
+    {
+      extern bool enabled;
+    }
+
+
 
     namespace viewmodel{
         extern bool enabled;

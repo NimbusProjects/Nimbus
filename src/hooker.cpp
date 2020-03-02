@@ -192,6 +192,7 @@ void Hooker::FindRankReveal()
 	MsgFunc_ServerRankRevealAll = reinterpret_cast<MsgFunc_ServerRankRevealAllFn>(func_address);
 }
 
+
 // "ClanTagChanged"
 void Hooker::FindSendClanTag()
 {

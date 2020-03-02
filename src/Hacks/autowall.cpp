@@ -38,7 +38,7 @@ static void ScaleDamage(HitGroups hitgroup, C_BasePlayer* enemy, float weapon_ar
 		}
 		else
 			current_damage *= weapon_armor_ratio * 0.5f;
-	}
+  }
 }
 
 static bool TraceToExit(Vector& end, trace_t* enter_trace, Vector start, Vector dir, trace_t* exit_trace)
@@ -114,7 +114,7 @@ static bool HandleBulletPenetration(CCSWeaponInfo* weaponInfo, Autowall::FireBul
 	data.trace_length += data.enter_trace.fraction * data.trace_length_remaining;
 	data.current_damage *= powf(weaponInfo->GetRangeModifier(), data.trace_length * 0.002f);
 
-	if (data.trace_length > 3000.f || enter_surf_penetration_mod < 0.1f)
+	if (data.trace_length > 1000.f || enter_surf_penetration_mod < 0.1f)
 		data.penetrate_count = 0;
 
 	if (data.penetrate_count <= 0)

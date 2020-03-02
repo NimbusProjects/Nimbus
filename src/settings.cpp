@@ -248,12 +248,15 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("AntiAim")][XORSTR("off2")] = Settings::AntiAim::off2;
 	settings[XORSTR("AntiAim")][XORSTR("roff1")] = Settings::AntiAim::roff1;
 	settings[XORSTR("AntiAim")][XORSTR("roff2")] = Settings::AntiAim::roff2;
+  settings[XORSTR("AntiAim")][XORSTR("loff1")] = Settings::AntiAim::loff1;
+	settings[XORSTR("AntiAim")][XORSTR("loff2")] = Settings::AntiAim::loff2;
 	settings[XORSTR("AntiAim")][XORSTR("fakeL")] = Settings::AntiAim::fakeL;
 	settings[XORSTR("AntiAim")][XORSTR("fakeR")] = Settings::AntiAim::fakeR;
   settings[XORSTR("AntiAim")][XORSTR("swap")] = Settings::AntiAim::swap;
   settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("offset")] = Settings::AntiAim::LBYBreaker::offset;
   settings[XORSTR("AntiAim")][XORSTR("AutoDisable")][XORSTR("knifeHeld")] = Settings::AntiAim::AutoDisable::knifeHeld;
 
+	settings[XORSTR("AntiAim")][XORSTR("HeadEdge")][XORSTR("distance")] = Settings::AntiAim::HeadEdge::distance;
 	settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("enabled")] = Settings::AntiAim::LBYBreaker::enabled;
 	settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("custom")] = Settings::AntiAim::LBYBreaker::custom;
   settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("amount")] = Settings::AntiAim::Desync::amount;
@@ -395,13 +398,20 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("enabled")] = Settings::ESP::HeadDot::enabled;
 	settings[XORSTR("ESP")][XORSTR("backtrack")][XORSTR("enabled")] = Settings::ESP::backtrack::enabled;
   settings[XORSTR("SvCheats")][XORSTR("enabled")] = Settings::SvCheats::enabled;
+
   settings[XORSTR("gravity")][XORSTR("enabled")] = Settings::SvCheats::gravity::enabled;
   settings[XORSTR("viewmodel")][XORSTR("enabled")] = Settings::SvCheats::viewmodel::enabled;
   settings[XORSTR("viewmodelfov")][XORSTR("fov")] = Settings::SvCheats::viewmodel::fov;
 
+  settings[XORSTR("aspect")][XORSTR("enabled")] = Settings::SvCheats::aspect::enabled;
+  settings[XORSTR("aspect")][XORSTR("var")] = Settings::SvCheats::aspect::var;
+
   settings[XORSTR("gravity")][XORSTR("enabled")] = Settings::SvCheats::gravity::enabled;
   settings[XORSTR("gravity")][XORSTR("amount")] = Settings::SvCheats::gravity::amount;
 
+
+  settings[XORSTR("bright")][XORSTR("enabled")] = Settings::SvCheats::bright::enabled;
+  settings[XORSTR("fog")][XORSTR("enabled")] = Settings::SvCheats::fog::enabled;
 
   settings[XORSTR("viewmodelx")][XORSTR("x")] = Settings::SvCheats::viewmodel::x;
   settings[XORSTR("viewmodely")][XORSTR("y")] = Settings::SvCheats::viewmodel::y;
@@ -485,6 +495,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("NoDuckCooldown")][XORSTR("enabled")] = Settings::NoDuckCooldown::enabled;
 
 
+	settings[XORSTR("AutoStrafe")][XORSTR("fastStop")] = Settings::AutoStrafe::fastStop;
 	settings[XORSTR("AutoStrafe")][XORSTR("enabled")] = Settings::AutoStrafe::enabled;
 	settings[XORSTR("AutoStrafe")][XORSTR("type")] = (int) Settings::AutoStrafe::type;
 	settings[XORSTR("AutoStrafe")][XORSTR("silent")] = Settings::AutoStrafe::silent;
@@ -524,8 +535,18 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("FOVChanger")][XORSTR("viewmodel_value")] = Settings::FOVChanger::viewmodelValue;
 	settings[XORSTR("FOVChanger")][XORSTR("ignore_scope")] = Settings::FOVChanger::ignoreScope;
 
+	settings[XORSTR("TickManip")][XORSTR("enabled")] = Settings::TickManip::enabled;
+
 	settings[XORSTR("Airstuck")][XORSTR("enabled")] = Settings::Airstuck::enabled;
 	settings[XORSTR("Airstuck")][XORSTR("key")] = Util::GetButtonName(Settings::Airstuck::key);
+
+	settings[XORSTR("TickOnKey")][XORSTR("enabled")] = Settings::TickOnKey::enabled;
+	settings[XORSTR("TickOnKey")][XORSTR("key")] = Util::GetButtonName(Settings::TickOnKey::key);
+
+	settings[XORSTR("TickOnShoot")][XORSTR("enabled")] = Settings::TickOnShoot::enabled;
+  //settings[XORSTR("TickOnShoot")][XORSTR("key")] = Util::GetButtonName(Settings::TickOnShoot::key);
+
+	settings[XORSTR("TickOnChoke")][XORSTR("enabled")] = Settings::TickOnChoke::enabled;
 
 	settings[XORSTR("SkinChanger")][XORSTR("Skins")][XORSTR("enabled")] = Settings::Skinchanger::Skins::enabled;
 	settings[XORSTR("SkinChanger")][XORSTR("Models")][XORSTR("enabled")] = Settings::Skinchanger::Models::enabled;
@@ -845,6 +866,9 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("off2")], &Settings::AntiAim::off2);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("roff1")], &Settings::AntiAim::roff1);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("roff2")], &Settings::AntiAim::roff2);
+  GetVal(settings[XORSTR("AntiAim")][XORSTR("loff1")], &Settings::AntiAim::loff1);
+	GetVal(settings[XORSTR("AntiAim")][XORSTR("loff2")], &Settings::AntiAim::loff2);
+
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("fakeL")], &Settings::AntiAim::fakeL);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("fakeR")], &Settings::AntiAim::fakeR);
   GetVal(settings[XORSTR("AntiAim")][XORSTR("enabled")], &Settings::AntiAim::enabled);
@@ -862,6 +886,7 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
   GetVal(settings[XORSTR("AntiAim")][XORSTR("swap")], &Settings::AntiAim::swap);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("offset")], &Settings::AntiAim::LBYBreaker::offset);
   GetVal(settings[XORSTR("AntiAim")][XORSTR("AutoDisable")][XORSTR("knifeHeld")], &Settings::AntiAim::AutoDisable::knifeHeld);
+	GetVal(settings[XORSTR("AntiAim")][XORSTR("HeadEdge")][XORSTR("distance")], &Settings::AntiAim::HeadEdge::distance);
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("custom")], &Settings::AntiAim::LBYBreaker::custom);
 
 	GetVal(settings[XORSTR("Resolver")][XORSTR("resolve_all")], &Settings::Resolver::resolveAll);
@@ -1000,14 +1025,24 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("ESP")][XORSTR("backtrack")][XORSTR("enabled")], &Settings::ESP::backtrack::enabled);
 
   GetVal(settings[XORSTR("SvCheats")][XORSTR("enabled")], &Settings::SvCheats::enabled);
+
+  GetVal(settings[XORSTR("aspect")][XORSTR("enabled")], &Settings::SvCheats::aspect::enabled);
+  GetVal(settings[XORSTR("aspect")][XORSTR("var")], &Settings::SvCheats::aspect::var);
+
+  GetVal(settings[XORSTR("bright")][XORSTR("enabled")], &Settings::SvCheats::bright::enabled);
+  GetVal(settings[XORSTR("fog")][XORSTR("enabled")], &Settings::SvCheats::fog::enabled);
+
   GetVal(settings[XORSTR("gravity")][XORSTR("enabled")], &Settings::SvCheats::gravity::enabled);
+
   GetVal(settings[XORSTR("viewmodel")][XORSTR("enabled")], &Settings::SvCheats::viewmodel::enabled);
   GetVal(settings[XORSTR("viewmodelfov")][XORSTR("fov")], &Settings::SvCheats::viewmodel::fov);
-  GetVal(settings[XORSTR("gravity")][XORSTR("enabled")], &Settings::SvCheats::gravity::enabled);
+
   GetVal(settings[XORSTR("gravity")][XORSTR("amount")], &Settings::SvCheats::gravity::amount);
+
   GetVal(settings[XORSTR("viewmodelx")][XORSTR("x")], &Settings::SvCheats::viewmodel::x);
   GetVal(settings[XORSTR("viewmodely")][XORSTR("y")], &Settings::SvCheats::viewmodel::y);
   GetVal(settings[XORSTR("viewmodelz")][XORSTR("z")], &Settings::SvCheats::viewmodel::z);
+
 	GetVal(settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("size")], &Settings::ESP::HeadDot::size);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Spread")][XORSTR("enabled")], &Settings::ESP::Spread::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Spread")][XORSTR("spreadLimit")], &Settings::ESP::Spread::spreadLimit);
@@ -1084,6 +1119,7 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("NoDuckCooldown")][XORSTR("enabled")], &Settings::NoDuckCooldown::enabled);
 
 
+	GetVal(settings[XORSTR("AutoStrafe")][XORSTR("fastStop")], &Settings::AutoStrafe::fastStop);
 	GetVal(settings[XORSTR("AutoStrafe")][XORSTR("enabled")], &Settings::AutoStrafe::enabled);
 	GetVal(settings[XORSTR("AutoStrafe")][XORSTR("type")], (int*)& Settings::AutoStrafe::type);
 	GetVal(settings[XORSTR("AutoStrafe")][XORSTR("silent")], &Settings::AutoStrafe::silent);
@@ -1123,8 +1159,18 @@ GetVal(settings[XORSTR("AntiAim")][XORSTR("Desync")][XORSTR("interval")], &Setti
 	GetVal(settings[XORSTR("FOVChanger")][XORSTR("viewmodel_value")], &Settings::FOVChanger::viewmodelValue);
 	GetVal(settings[XORSTR("FOVChanger")][XORSTR("ignore_scope")], &Settings::FOVChanger::ignoreScope);
 
+  GetVal(settings[XORSTR("TickManip")][XORSTR("enabled")], &Settings::TickManip::enabled);
+
 	GetVal(settings[XORSTR("Airstuck")][XORSTR("enabled")], &Settings::Airstuck::enabled);
 	GetButtonCode(settings[XORSTR("Airstuck")][XORSTR("key")], &Settings::Airstuck::key);
+
+  GetVal(settings[XORSTR("TickOnKey")][XORSTR("enabled")], &Settings::TickOnKey::enabled);
+	GetButtonCode(settings[XORSTR("TickOnkey")][XORSTR("key")], &Settings::TickOnKey::key);
+
+  GetVal(settings[XORSTR("TickOnShoot")][XORSTR("enabled")], &Settings::TickOnShoot::enabled);
+//  GetVal(settings[XORSTR("TickOnShoot")][XORSTR("enabled")], &Settings::TickOnShoot::enabled);
+
+  GetVal(settings[XORSTR("TickOnChoke")][XORSTR("enabled")], &Settings::TickOnChoke::enabled);
 
 	Settings::Skinchanger::Skins::enabled = false;
 	Settings::Skinchanger::skinsCT.clear();

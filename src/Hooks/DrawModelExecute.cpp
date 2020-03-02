@@ -10,6 +10,7 @@
 #include "../Hacks/thirdperson.h"
 #include "../Utils/math.h"
 #include "../Utils/xorstring.h"
+#include "../SDK/IInputSystem.h"
 
 typedef void (*DrawModelExecuteFn)(void*, void*, void*,
                                    const ModelRenderInfo_t&, matrix3x4_t*);
@@ -95,7 +96,9 @@ void VectorRotate(Vector v1, QAngle angle, Vector& out) {
 void Hooks::DrawModelExecute(void* thisptr, void* context, void* state,
                              const ModelRenderInfo_t& pInfo,
                              matrix3x4_t* pCustomBoneToWorld) {
+
   if (!Settings::ScreenshotCleaner::enabled || !engine->IsTakingScreenshot()) {
+    ESP::DrawModelExecute();
     Chams::DrawModelExecute(thisptr, context, state, pInfo, pCustomBoneToWorld);
   }
   if (!material_backtrack)
@@ -105,16 +108,17 @@ void Hooks::DrawModelExecute(void* thisptr, void* context, void* state,
 
   if (pInfo.entity_index < engine->GetMaxClients() &&
       pInfo.entity_index == engine->GetLocalPlayer()) {
-    const auto localplayer = entityList->GetClientEntity(pInfo.entity_index);
 
+	  const auto localPlayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
     if (Settings::ThirdPerson::enabled &&
-        Settings::ThirdPerson::type == ShowedAngle::BOTH) {
-
+        Settings::AntiAim::enabled) {
+ /*     QAngle fake_angle;
       matrix3x4_t custom_bones[MAXSTUDIOBONES];
-      //QAngle fake_angle = AntiAim::calculatedDesyncAngle;
-      QAngle fake_angle = CreateMove::lastTickViewAngles;
+
+      fake_angle = QAngle(0,localPlayer->GetAnimState()->currentFeetYaw - localPlayer->GetAnimState()->goalFeetYaw,0);
 
       Math::NormalizeAngles(fake_angle);
+      Math::ClampAngles(fake_angle);
       matrix3x4_t rotation_matrix;
       AngleMatrix(fake_angle, rotation_matrix);
       for (int i = 0; i < MAXSTUDIOBONES; i++) {
@@ -131,15 +135,17 @@ void Hooks::DrawModelExecute(void* thisptr, void* context, void* state,
         custom_bones[i][2][3] = OutPos.z;
       }
 
-      material_backtrack->ColorModulate(1.f, 1.f, 0.f);
+      material_backtrack->ColorModulate(1.0f, 0.0f, 1.0f);
       material_backtrack->AlphaModulate(Settings::BackTrack::Chams::alpha);
 
       modelRender->ForcedMaterialOverride(material_backtrack);
       modelRenderVMT->GetOriginalMethod<DrawModelExecuteFn>(21)(
           thisptr, context, state, pInfo, custom_bones);
-      modelRender->ForcedMaterialOverride(nullptr);
+      modelRender->ForcedMaterialOverride(nullptr);*/
     }
-  } else if (Settings::BackTrack::Chams::enabled) {
+  }
+
+    if (Settings::BackTrack::Chams::enabled) {
     const auto first_color = Color::FromImColor(
                    Settings::BackTrack::Chams::firstcolor.Color()),
                fade_color = Color::FromImColor(
@@ -212,7 +218,5 @@ void Hooks::DrawModelExecute(void* thisptr, void* context, void* state,
       thisptr, context, state, pInfo, pCustomBoneToWorld);
   modelRender->ForcedMaterialOverride(nullptr);
 
-  if (!Settings::ScreenshotCleaner::enabled || !engine->IsTakingScreenshot()) {
-    ESP::DrawModelExecute();
-  }
+
 }

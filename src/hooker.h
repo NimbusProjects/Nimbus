@@ -22,6 +22,7 @@ namespace Hooker
 	void FindGameRules();
 	void FindRankReveal();
 	void FindSendClanTag();
+	void ClientState();
 	void FindViewRender();
 	void FindPrediction();
 	void FindSetLocalPlayerReady();
@@ -30,6 +31,7 @@ namespace Hooker
 	void FindLineGoesThroughSmoke();
 	void FindInitKeyValues();
 	void FindLoadFromBuffer();
+  //bool __fastcall WriteUsercmdDeltaToBuffer_hook(void* ECX, void* EDX, int nSlot, bf_write* buf, int from, into to, bool isNewCmd);
 //	void FindVstdlibFunctions();
 	void FindOverridePostProcessingDisable();
 	void HookSwapWindow();

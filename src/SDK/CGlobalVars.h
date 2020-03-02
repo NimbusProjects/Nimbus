@@ -1,5 +1,3 @@
-#pragma once
-
 class CGlobalVars
 {
 public:
@@ -22,3 +20,5 @@ private:
 	int nTimestampNetworkingBase;
 	int nTimestampRandomizeWindow;
 };
+
+

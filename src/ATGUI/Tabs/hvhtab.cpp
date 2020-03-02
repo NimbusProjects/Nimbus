@@ -13,7 +13,7 @@
 void HvH::RenderTab()
 {
     const char* aTypes[] = {
-            "Rage", "Legit", "Advanced", "Custom"
+            "Rage", "Legit", "Advanced", "Ghetto" , "$crim", "Ruby", "Crooked",  "Custom"
     };
 
 
@@ -86,7 +86,9 @@ void HvH::RenderTab()
             ImGui::Columns(2, nullptr, true);
             {
                 ImGui::Separator();
-                ImGui::Checkbox(XORSTR("Freestand"), &Settings::AntiAim::Freestanding::enabled);
+                ImGui::Text("Edging");
+                ImGui::Checkbox(XORSTR("Enabled"), &Settings::AntiAim::Freestanding::enabled );
+                ImGui::SliderFloat(XORSTR("##EDGEDISTANCE"), &Settings::AntiAim::HeadEdge::distance, 20, 30, "Distance: %0.f");
                 ImGui::Separator();
 				        //ImGui::SliderFloat(XORSTR("##FAKELATENCYAMOUNT"), &Settings::FakeLatency::value, 1, 999, XORSTR("Fakelatency Amount: %0.f"));
                 ImGui::Checkbox(XORSTR("Fake Lag"), &Settings::FakeLag::enabled);
@@ -96,6 +98,8 @@ void HvH::RenderTab()
                     ImGui::Checkbox(XORSTR("Fake Lag States"), &Settings::FakeLag::States::enabled);
                     ImGui::Checkbox(XORSTR("Fake Lag On Peek"), &Settings::FakeLag::lagSpike);
                 }
+
+
             }
             ImGui::NextColumn();
             {
@@ -144,8 +148,8 @@ void HvH::RenderTab()
 
             ImGui::Text(XORSTR("Resolver"));
             ImGui::Checkbox(XORSTR("Resolve All"), &Settings::Resolver::resolveAll);
-            if(Settings::Resolver::resolveAll)
-            ImGui::SliderFloat(XORSTR("##DELT"), &Settings::Resolver::resolveDelt, 0, 1, "Resolver Delta %.2f");
+//            if(Settings::Resolver::resolveAll)
+//            ImGui::SliderFloat(XORSTR("##DELT"), &Settings::Resolver::resolveDelt, -1, 1, "Resolver Delta %.2f");
             ImGui::Separator();
 
 //	          if(Settings::Resolver::resolveAll == true)
@@ -157,25 +161,25 @@ void HvH::RenderTab()
             ImGui::Separator();
             ImGui::Checkbox(XORSTR("Angle Indicator"), &Settings::AngleIndicator::enabled);
             ImGui::Checkbox(XORSTR("LBY Breaker"), &Settings::AntiAim::LBYBreaker::enabled);
-           // if( Settings::AntiAim::LBYBreaker::enabled ){
-             //   ImGui::SliderFloat(XORSTR("##LBYOFFSET"), &Settings::AntiAim::LBYBreaker::offset, 0, 360, "LBY Offset(from fake): %0.f");
-            //}
-            if (Settings::AntiAim::LBYBreaker::enabled) {
-                ImGui::Checkbox(XORSTR("Custom Breaker Angle"), &Settings::AntiAim::LBYBreaker::custom);
+            if( Settings::AntiAim::LBYBreaker::enabled ){
+                ImGui::SliderFloat(XORSTR("##LBYOFFSET"), &Settings::AntiAim::LBYBreaker::offset, 0, 360, "LBY Offset(from fake): %0.f");
             }
-            if (Settings::AntiAim::LBYBreaker::enabled && Settings::AntiAim::LBYBreaker::custom) {
-                ImGui::SliderFloat(XORSTR("##LBYOFFSET"), &Settings::AntiAim::LBYBreaker::offset, 0, 360, "LBY Offset(from fake): %1.0f");
-            }
-                ImGui::SliderFloat(XORSTR("##DESYNC"), &Settings::AntiAim::Desync::amount, 0, 360, "Desync Offset %0.f");
+            //if (Settings::AntiAim::LBYBreaker::enabled) {
+            //    ImGui::Checkbox(XORSTR("Custom Breaker Angle"), &Settings::AntiAim::LBYBreaker::custom);
+           // }
+
+                ImGui::SliderFloat(XORSTR("##DESYNC"), &Settings::AntiAim::Desync::amount, 0, 360, "Desync Angle %0.f");
                 ImGui::Separator();
                 ImGui::Text("!CAREFUL WITH THIS! \nUsable with the Advanced/Rage AntiAim type. \nGL HF gamers :))");
                 //ImGui::SliderFloat(XORSTR("##DTIME"), &Settings::AntiAim::Desync::time, 0.25, 4.2, "Desync Time %.3f");
                 //ImGui::SliderFloat(XORSTR("##DINTERVAL"), &Settings::AntiAim::Desync::interval, 0.010, 5.5, "Desync Interval %.3f");
                 //ImGui::SliderFloat(XORSTR("##DOFF1"), &Settings::AntiAim::off1, 0.1, 360, "Desync Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 0.1, 56, "Desync Random Offset %.3f");
+                ImGui::SliderFloat(XORSTR("##DOFF2"), &Settings::AntiAim::off2, 1, 360, "Desync Random Offset %.3f");
                 //ImGui::SliderFloat(XORSTR("##ROFF1"), &Settings::AntiAim::roff1, 0.1, 360, "Real Random Offset 1 %.3f");
-                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 0.1, 56, "Real  Random Offset %.3f");
+                ImGui::SliderFloat(XORSTR("##ROFF2"), &Settings::AntiAim::roff2, 1, 360, "Real  Random Offset %.3f");
 
+                ImGui::SliderFloat(XORSTR("##LOFF1"), &Settings::AntiAim::loff1, 1, 360, "LBY  Random Offset 1 %.3f");
+                ImGui::SliderFloat(XORSTR("##LOFF2"), &Settings::AntiAim::loff2, 1, 360, "LBY  Random Offset 2 %.3f");
                 ImGui::Separator();
                 ImGui::Text("Not implemented yet...");
                 ImGui::Text("!CHANGES LEGIT AA ANGLES CAN SEE ON OVERWATCH!");
@@ -191,8 +195,24 @@ void HvH::RenderTab()
 				ImGui::Checkbox(XORSTR("BackTrack Draw Last Only"), &Settings::BackTrack::Chams::drawlastonly);
 				ImGui::SliderInt(XORSTR("##LAGCOMP"), &Settings::BackTrack::time, 2.f, 24.f, XORSTR("LagComp: %0.2f TICKS"));
 				ImGui::SliderFloat(XORSTR("##LAGCOMPFOV"), &Settings::BackTrack::fov, 1.f, 180.f, XORSTR("LagComp FOV: %0.2f"));
+				ImGui::SliderFloat(XORSTR("##FAKEALPHA"), &Settings::BackTrack::Chams::alpha, 0.f, 1.f, XORSTR("Fake Alpha: %0.2f")); //TODO: rename
 
             }
+              ImGui::Separator();
+              ImGui::Text("Tickbase Manipulation");
+
+              ImGui::Checkbox(XORSTR("Toggle"), &Settings::TickManip::enabled);
+
+              ImGui::Checkbox(XORSTR("AirStuck"), &Settings::Airstuck::enabled);
+              UI::KeyBindButton(&Settings::Airstuck::key);
+
+              ImGui::Checkbox(XORSTR("Tick On Shoot"), &Settings::TickOnShoot::enabled);
+//              UI::KeyBindButton(&Settings::TickOnShoot::key); // might add in real doubletap later, idk
+
+              ImGui::Checkbox(XORSTR("Tick On Key"), &Settings::TickOnKey::enabled);
+              UI::KeyBindButton(&Settings::TickOnKey::key);
+
+              ImGui::Checkbox(XORSTR("Tick On Choke"), &Settings::TickOnChoke::enabled);
         }
             ImGui::EndChild();
     }

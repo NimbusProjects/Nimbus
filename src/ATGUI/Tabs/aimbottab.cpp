@@ -51,7 +51,7 @@ static bool smokeCheck = false;
 static bool flashCheck = false;
 static bool spreadLimitEnabled = false;
 static float spreadLimit = 0.1f;
-static float HeadMultiPoint = 0.6f;
+static float HeadMultiPoint = 0.75f;
 static bool autoWallEnabled = false;
 static float autoWallValue = 10.0f;
 static bool autoAimRealDistance = false;
@@ -633,7 +633,7 @@ void Aimbot::RenderTab()
 			ImGui::Checkbox(XORSTR("Velocity Check"), &Settings::Aimbot::AutoShoot::velocityCheck);
 			if( ImGui::Checkbox(XORSTR("Spread Limit"), &spreadLimitEnabled) )
 				UI::UpdateWeaponSettings();
-			if( ImGui::SliderFloat(XORSTR("##SPREADLIMIT"), &spreadLimit, 0, 0.1) )
+			if( ImGui::SliderFloat(XORSTR("##SPREADLIMIT"), &spreadLimit, 0, 0.1), "Spread Limit %.3f" )
 				UI::UpdateWeaponSettings();
 
       ImGui::Separator();
@@ -753,7 +753,7 @@ void Aimbot::RenderTab()
 			ImGui::NextColumn();
 			{
 				ImGui::PushItemWidth(-1);
-						if (ImGui::SliderFloat(XORSTR("##AUTOWALLDMG"), &autoWallValue, 0, 100, XORSTR("Min Damage: %1.0f")))
+						if (ImGui::SliderFloat(XORSTR("##AUTOWALLDMG"), &autoWallValue, 0, 120, XORSTR("Min Damage: %1.0f")))
 							UI::UpdateWeaponSettings();
 						ImGui::PopItemWidth();
 					}

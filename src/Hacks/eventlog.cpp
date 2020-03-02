@@ -93,7 +93,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 	if (!localplayer)
 		return;
 
-	if (strstr(event->GetName(), XORSTR("player_hurt")) && Settings::Eventlog::filterDamage){
+	if (strstr(event->GetName(), XORSTR("player_hurt"))){
 
 		int hurt_player_id = event->GetInt(XORSTR("userid"));
 		int attacker_id = event->GetInt(XORSTR("attacker"));
@@ -145,7 +145,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(damageLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("item_purchase")) && Settings::Eventlog::filterPurchases){
+	} else if (strstr(event->GetName(), XORSTR("item_purchase"))){
 
 		int buyer_player_id = event->GetInt(XORSTR("userid"));
 
@@ -172,15 +172,17 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 		std::string boughtLog = std::string(buyerInformation.name);
 		boughtLog += XORSTR(" bought ");
 
-		std::string weaponname = event->GetString(XORSTR("weapon")); // 'item' for items ?
-		std::size_t found = weaponname.find('_');
-		if (found != std::string::npos)
-			weaponname.erase(0, found+1);
-		boughtLog += weaponname;
+		std::string deletefromname = "weapon_";
+		std::string weaponname = event->GetString(XORSTR("weapon"));
+		std::string::size_type whereisstring = weaponname.find(deletefromname);
+		if( whereisstring != std::string::npos ){
+            weaponname.erase(whereisstring, deletefromname.length());
+            boughtLog += weaponname;
 
-		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(boughtLog, now));
+            logToShow.insert(logToShow.begin(), std::pair<std::string, long>(boughtLog, now));
+		}
 
-	} else if (strstr(event->GetName(), XORSTR("enter_bombzone")) && Settings::Eventlog::filterBombsite){
+	} else if (strstr(event->GetName(), XORSTR("enter_bombzone"))){
 
 		int bomb_player_id = event->GetInt(XORSTR("userid"));
 
@@ -212,7 +214,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(bombLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("bomb_begindefuse")) && Settings::Eventlog::filterDefuse){
+	} else if (strstr(event->GetName(), XORSTR("bomb_begindefuse"))){
 
 		int defuse_player_id = event->GetInt(XORSTR("userid"));
 
@@ -247,7 +249,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(defuseLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("bomb_beginplant")) && Settings::Eventlog::filterPlant){
+	} else if (strstr(event->GetName(), XORSTR("bomb_beginplant"))){
 		//To add: check on which bomb-site is player planting
 
 		int plant_player_id = event->GetInt(XORSTR("userid"));
@@ -278,8 +280,8 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(plantLog, now));
 
+	} else if (strstr(event->GetName(), XORSTR("item_pickup"))){
 
-	} else if (strstr(event->GetName(), XORSTR("item_remove")) && Settings::Eventlog::filterDrop){
 		int pickup_player_id = event->GetInt(XORSTR("userid"));
 
 		if ((engine->GetPlayerForUserID(pickup_player_id) == engine->GetLocalPlayer()) && !Settings::Eventlog::showLocalplayer)

@@ -145,7 +145,7 @@ void LogShots::CreateMove(CUserCmd* cmd)
         return;
 
     if (shots.empty()) return;
-    auto shot = shots.front();
+    auto shot = LogShots::shots.front();
     if (shot.processed || shot.hit || abs(shot.time - globalVars->curtime) > 1.f)
     {
         shots.erase(shots.begin());

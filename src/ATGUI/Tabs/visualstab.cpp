@@ -103,7 +103,6 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Head Dot"), &Settings::ESP::HeadDot::enabled);
 				//ImGui::Checkbox(XORSTR("backtrack"), &Settings::ESP::backtrack::enabled);
 
-				//ImGui::SliderFloat(XORSTR("##NASATRACKALPHA"), &Settings::BackTrack::Chams::alpha, 0.f, 1.f, XORSTR("BackTrack Alpha: %0.2f"));
 
 
 

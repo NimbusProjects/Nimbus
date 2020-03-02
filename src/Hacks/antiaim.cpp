@@ -1,6 +1,8 @@
 #include "antiaim.h"
 
 #include "aimbot.h"
+#include "exploits.h"
+#include "fakelag.h"
 #include "../settings.h"
 #include "../Hooks/hooks.h"
 #include "../Utils/math.h"
@@ -18,9 +20,14 @@ float Settings::AntiAim::off2 = 1;
 float Settings::AntiAim::roff1 = 1;
 float Settings::AntiAim::roff2 = 1;
 
+
+float Settings::AntiAim::loff1 = 1;
+float Settings::AntiAim::loff2 = 1;
+
 int Settings::AntiAim::fakeL = 0;
 int Settings::AntiAim::fakeR = 0;
 
+float Settings::AntiAim::HeadEdge::distance = 25.0f;
 ButtonCode_t Settings::AntiAim::left = ButtonCode_t::KEY_LEFT;
 ButtonCode_t Settings::AntiAim::right = ButtonCode_t::KEY_RIGHT;
 
@@ -48,9 +55,11 @@ float Settings::AntiAim::Desync::amount = 45.0f;
 float Settings::AntiAim::Desync::time = 1.1f;
 float Settings::AntiAim::Desync::interval = 0.22f;
 
-QAngle AntiAim::realAngle;
-QAngle AntiAim::fakeAngle;
+
 QAngle AntiAim::calculatedDesyncAngle;
+QAngle AntiAim::fakeAngle;
+QAngle AntiAim::realAngle;
+QAngle AntiAim::angle;
 
 
 
@@ -65,6 +74,13 @@ inline float RandomFloat2(float min, float max)
 {
   min = fmod((float)rand(),Settings::AntiAim::roff1);
   max = fmod((float)rand(),Settings::AntiAim::roff2);
+  return (min, max);
+}
+
+inline float RandomFloat3(float min, float max)
+{
+  min = fmod((float)rand(),Settings::AntiAim::loff1);
+  max = fmod((float)rand(),Settings::AntiAim::loff2);
   return (min, max);
 }
 
@@ -90,8 +106,49 @@ float AntiAim::GetMaxDelta(CCSGOAnimState *animState) {
     return delta - 0.5f;
 }
 
-// Pasted from space!hook, but I tried
+
+static float Distance(Vector a, Vector b)
+{
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+}
+
 static bool GetBestHeadAngle(QAngle& angle)
+{
+    C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+
+    Vector position = localplayer->GetVecOrigin() + localplayer->GetVecViewOffset();
+
+    float closest_distance = 100.0f;
+
+    float radius = Settings::AntiAim::HeadEdge::distance + 0.1f;
+    float step = M_PI * 2.0 / 8;
+
+    for (float a = 0; a < (M_PI * 2.0); a += step)
+    {
+        Vector location(radius * cos(a) + position.x, radius * sin(a) + position.y, position.z);
+
+        Ray_t ray;
+        trace_t tr;
+        ray.Init(position, location);
+        CTraceFilter traceFilter;
+        traceFilter.pSkip = localplayer;
+        trace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
+
+        float distance = Distance(position, tr.endpos);
+
+        if (distance < closest_distance)
+        {
+            closest_distance = distance;
+            angle.y = RAD2DEG(a);
+        }
+    }
+
+    return closest_distance < Settings::AntiAim::HeadEdge::distance;
+}
+// Pasted from space!hook, but I tried
+
+
+/*static bool GetBestHeadAngle(QAngle& angle)
 {
 	float b, r, l;
 
@@ -179,23 +236,17 @@ static bool GetBestHeadAngle(QAngle& angle)
 
 	return true;
 }
-
+*/
 
 static void DoAntiAim(AntiAimType type, QAngle& angle, bool bSend, CCSGOAnimState* animState, bool directionSwitch, C_BasePlayer* localplayer, CUserCmd* cmd)
 {
 
+  C_BasePlayer* player;
 
   float off1 = Settings::AntiAim::off1;
   float off2 = Settings::AntiAim::off2;
-//	float off3 = Settings::AntiAim::off1;
-//  float off4 = Settings::AntiAim::off2;
-
   float roff1 = Settings::AntiAim::roff1;
   float roff2 = Settings::AntiAim::roff2;
-//	float roff3 = Settings::AntiAim::roff1;
-//  float roff4 = Settings::AntiAim::roff2;
-
-
 
   float DesyncOffset = RandomFloat(off1, off2);// - (RandomFloat2(off3, off4) + 4);
   float RealOffset = RandomFloat2(roff1, roff2);// - (RandomFloat2(roff3, roff4) + 4);
@@ -224,6 +275,9 @@ static void DoAntiAim(AntiAimType type, QAngle& angle, bool bSend, CCSGOAnimStat
     {
     case AntiAimType::RAGE: {
 
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
+
         static bool yFlip = false;
 
         angle.x = 89.0f;
@@ -246,54 +300,301 @@ static void DoAntiAim(AntiAimType type, QAngle& angle, bool bSend, CCSGOAnimStat
 
     case AntiAimType::LEGIT: {
 
-        if (!bSend)
-            angle.y += directionSwitch ? Settings::AntiAim::Desync::amount : -Settings::AntiAim::Desync::amount;
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
 
-    } break;
+    if (!bSend)
+        angle.y += directionSwitch ? 60 : -60;
+    else
+        cmd->command_number % 2;
+
+      }break;
 
       case AntiAimType::DUMP: {
         angle.x = 89.0f;
 
-        static bool yFlip = false;
-        static bool dFlip = false;
-        static bool lFlip = false;
-        static bool gFlip = false;
-
-          if(!bSend){
-            CreateMove::sendPacket2 = false;
-            //angle.y += directionSwitch ? -DesyncOffset : DesyncOffset;
-            angle.y += directionSwitch ? (-maxDelta - Settings::AntiAim::Desync::amount) - RealOffset : (-maxDelta - Settings::AntiAim::Desync::amount ) - RealOffset;
-
-         }
-        else{
-
-          CreateMove::sendPacket2 = true;
-          if (yFlip)
-              angle.y += directionSwitch ? (-maxDelta + Settings::AntiAim::Desync::amount) + DesyncOffset : (maxDelta - Settings::AntiAim::Desync::amount ) - DesyncOffset;
-            else
-              angle.y += directionSwitch ? (maxDelta - Settings::AntiAim::Desync::amount) - DesyncOffset : (maxDelta - Settings::AntiAim::Desync::amount ) + DesyncOffset;
-
-      if (lFlip)
-          angle.y += directionSwitch ? maxDelta - Settings::AntiAim::Desync::amount : -maxDelta + Settings::AntiAim::Desync::amount;
-        else
-          angle.y += directionSwitch ? -maxDelta + Settings::AntiAim::Desync::amount : maxDelta - Settings::AntiAim::Desync::amount;
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
 
 
-        if (gFlip)
-            angle.y += directionSwitch ? -maxDelta + 29 : maxDelta  - 29;
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
+
+
+     if (!bSend)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + DesyncOffset : -Settings::AntiAim::Desync::amount - DesyncOffset;
+     else
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + RealOffset : Settings::AntiAim::Desync::amount - RealOffset;
+
+
+
+    } break;
+
+    case AntiAimType::GHETTO: {
+
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
+
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
+
+     if (!bSend)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + DesyncOffset : -Settings::AntiAim::Desync::amount - DesyncOffset;
+     else
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + RealOffset : Settings::AntiAim::Desync::amount - RealOffset;
+
+
+
+    } break;
+
+    case AntiAimType::SCRIM: {
+      angle.x = 89.0f;
+
+
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
+
+      static bool bFlip = true;
+      angle.x = 89.0f;
+
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
+
+     //this is from !bSend to bSend
+     if (bSend){
+       if(DesyncOffset >= 1 && DesyncOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 66 : -66;
           else
-            angle.y += directionSwitch ? maxDelta - 29 : maxDelta + 29;
-
-        if (dFlip)
-            angle.y += directionSwitch ? -maxDelta + DesyncOffset : maxDelta  - DesyncOffset;
+         angle.y += directionSwitch ? -126 : 126;
+       }
+        else  if(DesyncOffset >= 46 && DesyncOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? 36 : -36;
           else
-            angle.y += directionSwitch ? maxDelta - DesyncOffset : maxDelta + DesyncOffset;
-
-            dFlip = !dFlip;
-            lFlip = !lFlip;
-            yFlip = !yFlip;
-            gFlip = !gFlip;
+         angle.y += directionSwitch ? -111 : 111;
         }
+        else  if(DesyncOffset >= 50 && DesyncOffset <= 59)
+        {
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 344 : -Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? 77 : -77;
+          else
+         angle.y += directionSwitch ? -2 : 2;
+        }
+        else  if(DesyncOffset >= 60 && DesyncOffset <= 69)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 111 : -Settings::AntiAim::Desync::amount - 111;
+        else  if(DesyncOffset >= 70 && DesyncOffset <= 79)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 23 : -Settings::AntiAim::Desync::amount - 23;
+        else  if(DesyncOffset >= 80 && DesyncOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 179 : -179;
+          else
+         angle.y += directionSwitch ? -8 : 13;
+        }
+      bFlip = !bFlip;
+     }
+     else{
+       if(RealOffset >= 1 && RealOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 179 : -179;
+          else
+         angle.y += directionSwitch ? -83 : 83;
+       }
+        else  if(RealOffset >= 46 && RealOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? -55 : 55;
+          else
+         angle.y += directionSwitch ? 151 : -151;
+        }
+        else  if(RealOffset >= 50 && RealOffset <= 59)
+        {
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 344 : Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? -93 : 93;
+          else
+         angle.y += directionSwitch ? 66 : -66;
+        }
+        else  if(RealOffset >= 60 && RealOffset <= 69)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 111 : Settings::AntiAim::Desync::amount - 111;
+        else  if(RealOffset >= 70 && RealOffset <= 79)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 23 : Settings::AntiAim::Desync::amount - 23;
+        else  if(RealOffset >= 80 && RealOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 3 : -3;
+          else
+         angle.y += directionSwitch ? -220 : 220;
+        }
+     }
+      bFlip = !bFlip;
+
+
+
+
+    } break;
+
+
+    case AntiAimType::RUBY: {
+
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
+
+      static bool bFlip = true;
+      angle.x = 89.0f;
+
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
+
+     if (!bSend){
+       if(DesyncOffset >= 1 && DesyncOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 36 : -36;
+          else
+         angle.y += directionSwitch ? -166 : 166;
+       }
+        else  if(DesyncOffset >= 46 && DesyncOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? 96 : -96;
+          else
+         angle.y += directionSwitch ? -111 : 111;
+        }
+        else  if(DesyncOffset >= 50 && DesyncOffset <= 59)
+        {
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 344 : -Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? 56 : -56;
+          else
+         angle.y += directionSwitch ? -78 : 76;
+        }
+        else  if(DesyncOffset >= 60 && DesyncOffset <= 69)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 111 : -Settings::AntiAim::Desync::amount - 111;
+        else  if(DesyncOffset >= 70 && DesyncOffset <= 79)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 23 : -Settings::AntiAim::Desync::amount - 23;
+        else  if(DesyncOffset >= 80 && DesyncOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 179 : -179;
+          else
+         angle.y += directionSwitch ? -8 : 13;
+        }
+      bFlip = !bFlip;
+     }
+     else{
+       if(RealOffset >= 1 && RealOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 139 : -139;
+          else
+         angle.y += directionSwitch ? -83 : 83;
+       }
+        else  if(RealOffset >= 46 && RealOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? -155 : 155;
+          else
+         angle.y += directionSwitch ? 15 : -15;
+        }
+        else  if(RealOffset >= 50 && RealOffset <= 59)
+        {
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 344 : Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? -9 : 9;
+          else
+         angle.y += directionSwitch ? 93 : -93;
+        }
+        else  if(RealOffset >= 60 && RealOffset <= 69)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 111 : Settings::AntiAim::Desync::amount - 111;
+        else  if(RealOffset >= 70 && RealOffset <= 79)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 23 : Settings::AntiAim::Desync::amount - 23;
+        else  if(RealOffset >= 80 && RealOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 3 : -3;
+          else
+         angle.y += directionSwitch ? -220 : 220;
+        }
+     }
+      bFlip = !bFlip;
+
+
+
+
+    } break;
+
+
+    case AntiAimType::CROOKED: {
+
+      if(IN_ATTACK || IN_ATTACK2)
+        !bSend;
+
+      static bool bFlip = true;
+      angle.x = 89.0f;
+
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
+
+     if (!bSend){
+       if(DesyncOffset >= 1 && DesyncOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 36 : -36;
+          else
+         angle.y += directionSwitch ? -166 : 166;
+       }
+        else  if(DesyncOffset >= 46 && DesyncOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? 96 : -96;
+          else
+         angle.y += directionSwitch ? -111 : 111;
+        }
+        else  if(DesyncOffset >= 50 && DesyncOffset <= 59)
+        {
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 344 : -Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? 56 : -56;
+          else
+         angle.y += directionSwitch ? -78 : 76;
+        }
+        else  if(DesyncOffset >= 60 && DesyncOffset <= 69)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 111 : -Settings::AntiAim::Desync::amount - 111;
+        else  if(DesyncOffset >= 70 && DesyncOffset <= 79)
+         angle.y += directionSwitch ? Settings::AntiAim::Desync::amount + 23 : -Settings::AntiAim::Desync::amount - 23;
+        else  if(DesyncOffset >= 80 && DesyncOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 179 : -179;
+          else
+         angle.y += directionSwitch ? -8 : 13;
+        }
+      bFlip = !bFlip;
+     }
+     else{
+       if(RealOffset >= 1 && RealOffset <= 45){
+          if(bFlip)
+         angle.y += directionSwitch ? 179 : -179;
+          else
+         angle.y += directionSwitch ? -83 : 83;
+       }
+        else  if(RealOffset >= 46 && RealOffset <= 49){
+          if(bFlip)
+         angle.y += directionSwitch ? -55 : 55;
+          else
+         angle.y += directionSwitch ? 151 : -151;
+        }
+        else  if(RealOffset >= 50 && RealOffset <= 59)
+        {
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 344 : Settings::AntiAim::Desync::amount - 344;
+          if(bFlip)
+         angle.y += directionSwitch ? -96 : 26;
+          else
+         angle.y += directionSwitch ? 108 : -46;
+        }
+        else  if(RealOffset >= 60 && RealOffset <= 69)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 111 : Settings::AntiAim::Desync::amount - 111;
+        else  if(RealOffset >= 70 && RealOffset <= 79)
+         angle.y += directionSwitch ? -Settings::AntiAim::Desync::amount + 23 : Settings::AntiAim::Desync::amount - 23;
+        else  if(RealOffset >= 80 && RealOffset <= 360){
+          if(bFlip)
+         angle.y += directionSwitch ? 3 : -3;
+          else
+         angle.y += directionSwitch ? -220 : 220;
+        }
+     }
+      bFlip = !bFlip;
     } break;
 
 
@@ -301,6 +602,9 @@ static void DoAntiAim(AntiAimType type, QAngle& angle, bool bSend, CCSGOAnimStat
     case AntiAimType::CUSTOM: {
 
         angle.x = 89.0f;
+
+     if (std::fabs(cmd->sidemove) < 5.f)
+        cmd->sidemove = cmd->buttons & IN_DUCK ? cmd->tick_count & 1 ? 3.25f : -3.25f : cmd->tick_count & 1 ? 1.1f : -1.1f;
 
         if (Settings::AntiAim::States::enabled)
         {
@@ -338,7 +642,6 @@ void AntiAim::CreateMove(CUserCmd* cmd)
     float oldSideMove = cmd->sidemove;
 
     QAngle angle = cmd->viewangles;
-
     C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
     if (!localplayer || !localplayer->GetAlive())
         return;
@@ -367,9 +670,6 @@ void AntiAim::CreateMove(CUserCmd* cmd)
     QAngle edge_angle = angle;
 	bool freestanding = Settings::AntiAim::Freestanding::enabled && GetBestHeadAngle(edge_angle);
 
-    static bool bSend = true;
-    bSend = !bSend;
-
     static bool directionSwitch = false;
 
     if (inputSystem->IsButtonDown(Settings::AntiAim::left))
@@ -378,43 +678,56 @@ void AntiAim::CreateMove(CUserCmd* cmd)
 		directionSwitch = false;
 
     CCSGOAnimState* animState = localplayer->GetAnimState();
+
+    float maxDelta = AntiAim::GetMaxDelta(animState);
+    float lbyOffset = Settings::AntiAim::LBYBreaker::enabled ? Settings::AntiAim::LBYBreaker::offset : maxDelta;
+
     bool needToFlick = false;
 
+    float vel2D = localplayer->GetVelocity().Length2D();//localplayer->GetAnimState()->verticalVelocity + localplayer->GetAnimState()->horizontalVelocity;
     static float lastCheck;
     static bool lbyBreak = false;
 
-    if (localplayer->GetVelocity().Length2D() >= 0.1f || !(localplayer->GetFlags() & FL_ONGROUND) || localplayer->GetFlags() & FL_FROZEN)
-    {
-        lbyBreak = false;
-        lastCheck = globalVars->curtime;
-    }
-    else
-    {
-        if (!lbyBreak && (globalVars->curtime - lastCheck) > 0.22)
-        {
-            angle.y += directionSwitch ? -AntiAim::GetMaxDelta(animState) : AntiAim::GetMaxDelta(animState);
-            lbyBreak = true;
+    float loff1 = Settings::AntiAim::loff1;
+    float loff2 = Settings::AntiAim::loff2;
+
+
+
+    if( Settings::AntiAim::LBYBreaker::enabled ){
+
+        float LBYRand = RandomFloat3(loff1, loff2);// - (RandomFloat2(off3, off4) + 4);
+        if( vel2D >= 0.1f || !(localplayer->GetFlags() & FL_ONGROUND) || localplayer->GetFlags() & FL_FROZEN ){
+            lbyBreak = false;
             lastCheck = globalVars->curtime;
-            needToFlick = true;
-        }
-        else if (lbyBreak && (globalVars->curtime - lastCheck) > 1.1)
-        {
-            angle.y += directionSwitch ? -AntiAim::GetMaxDelta(animState) : AntiAim::GetMaxDelta(animState);
-            lbyBreak = true;
-            lastCheck = globalVars->curtime;
-            needToFlick = true;
+            CreateMove::sendPacket = true;
+        } else {
+            if( !lbyBreak && ( globalVars->curtime - lastCheck ) > 0.22 ){
+                angle.y += directionSwitch ? -Settings::AntiAim::LBYBreaker::offset - LBYRand : Settings::AntiAim::LBYBreaker::offset + LBYRand;
+                lbyBreak = true;
+                lastCheck = globalVars->curtime;
+                needToFlick = true;
+                CreateMove::sendPacket = false;
+            } else if( lbyBreak && ( globalVars->curtime - lastCheck ) > 1.1 ){
+                angle.y += directionSwitch ? -Settings::AntiAim::LBYBreaker::offset - LBYRand : Settings::AntiAim::LBYBreaker::offset + LBYRand;
+                lbyBreak = true;
+                lastCheck = globalVars->curtime;
+                needToFlick = true;
+                CreateMove::sendPacket = false;
+            }
         }
     }
 
-    if (needToFlick)
-        CreateMove::sendPacket = false;
-    else
+    if(Settings::AntiAim::enabled && !needToFlick)
     {
-        CreateMove::sendPacket = bSend;
-        static AntiAimType type;
+      static bool bSend = true;
+      bSend = !bSend;
+
+      CreateMove::sendPacket = bSend;
+      static AntiAimType type;
 
     	DoAntiAim(type, angle, bSend, animState, directionSwitch, localplayer, cmd);
 
+      Airstuck::CreateMove(cmd, bSend);
         if (freestanding)
             angle.y = edge_angle.y;
     }

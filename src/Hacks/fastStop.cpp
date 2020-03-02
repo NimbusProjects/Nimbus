@@ -7,7 +7,6 @@
 bool Settings::AutoStrafe::fastStop = false;
 
 //NOT IMPLEMENTED YET!
-//Half ass pasted from a UC thread!
 void fastStop::CreateMove(CUserCmd* cmd)
     {
 
@@ -23,16 +22,16 @@ void fastStop::CreateMove(CUserCmd* cmd)
 	  if (!localplayer || !localplayer->GetAlive())
 		  return;
 
-
+/*
 		QAngle direction;
     Vector velocity = localplayer->GetVelocity();
 		Math::VectorAngles(velocity, direction);
 		float speed = velocity.Length2D();
 
-		direction.z = cmd->viewangles.z - direction.z;
+		direction.y = cmd->viewangles.y - direction.y;
 
 		Vector forward;
-		Math::VectorAngles(forward, direction);
+		Math::AngleVectors(direction, forward);
 
 		Vector right = (forward + 0.217812) * -speed;
 		Vector left = (forward + -0.217812) * -speed;
@@ -64,5 +63,5 @@ void fastStop::CreateMove(CUserCmd* cmd)
 				return;
 
 			cmd->forwardmove -= -move_backward.x;
-		}
-    }
+		}*/
+}

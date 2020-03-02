@@ -40,22 +40,15 @@ void FakeLag::CreateMove(CUserCmd* cmd, bool bSend)
 		return;
 
 
-   if(Settings::FakeLag::lagSpike && localplayer->GetVelocity().Length() >= 1.0f &&  localplayer->GetVelocity().Length() <= 130.0f && (localplayer->GetFlags() & FL_ONGROUND))
+   if(Settings::FakeLag::lagSpike && localplayer->GetVelocity().Length() >= 1.0f &&  localplayer->GetVelocity().Length() <= 35.0f && (localplayer->GetFlags() & FL_ONGROUND))
    {
-		CreateMove::sendPacket2 = ticks < 16 - 1;
+	  CreateMove::sendPacket2 = ticks < 16;
     return;
   }
 
 
-
-    static bool attack = false;
-
-  	if (cmd->buttons & IN_ATTACK && !attack)
-	  {
-		  CreateMove::sendPacket2 = ticks < 16 - 16;
-      attack = !attack;
-		  return;
-	  }
+    if (cmd->buttons & IN_USE || cmd->buttons & IN_ATTACK)
+      CreateMove::sendPacket2 = true;
 
 
 	if (ticks >= ticksMax)
@@ -69,7 +62,7 @@ void FakeLag::CreateMove(CUserCmd* cmd, bool bSend)
 	{
 		if (Settings::FakeLag::States::Air::enabled && !(localplayer->GetFlags() & FL_ONGROUND))
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Air::value;
-		else if (Settings::FakeLag::States::Moving::enabled && localplayer->GetVelocity().Length() >= 145.f)
+		else if (Settings::FakeLag::States::Moving::enabled && localplayer->GetVelocity().Length() > 150.f)
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Moving::value;
 		else if(Settings::FakeLag::States::Standing::enabled)
 			CreateMove::sendPacket2 = ticks < 16 - Settings::FakeLag::States::Standing::value;

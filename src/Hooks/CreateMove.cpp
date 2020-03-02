@@ -6,6 +6,7 @@
 #include "../Hacks/bhop.h"
 #include "../Hacks/noduckcooldown.h"
 #include "../Hacks/lagcomp.h"
+#include "../Hacks/lby.h"
 #include "../Hacks/autostrafe.h"
 #include "../Hacks/showranks.h"
 #include "../Hacks/autodefuse.h"
@@ -20,7 +21,7 @@
 #include "../Hacks/triggerbot.h"
 #include "../Hacks/autoknife.h"
 #include "../Hacks/antiaim.h"
-#include "../Hacks/airstuck.h"
+#include "../Hacks/exploits.h"
 #include "../Hacks/fakelag.h"
 #include "../Hacks/esp.h"
 #include "../Hacks/tracereffect.h"
@@ -35,6 +36,9 @@
 bool CreateMove::sendPacket = true;
 bool CreateMove::sendPacket2 = true; // Special thanks to tim for the second sendPacket ! give him much love xoxoxoxo
 bool bSend;
+
+CBaseClientState choke;
+
 QAngle CreateMove::lastTickViewAngles = QAngle(0, 0, 0);
 
 typedef bool (*CreateMoveFn) (void*, float, CUserCmd*);
@@ -47,9 +51,12 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 	{
         // Special thanks to Gre-- I mean Heep ( https://www.unknowncheats.me/forum/counterstrike-global-offensive/290258-updating-bsendpacket-linux.html )
         uintptr_t rbp;
+        uintptr_t rbp2;
         asm volatile("mov %%rbp, %0" : "=r" (rbp));
+        asm volatile("mov %%rbp, %0" : "=r" (rbp2));
         bool *sendPacket = ((*(bool **)rbp) - 0x18);
-        bool *sendPacket2 = ((*(bool **)rbp) - 0x18);
+        //int sendPacket = choke.chokedCommands;
+        bool *sendPacket2 = ((*(bool **)rbp2) - 0x18);
         CreateMove::sendPacket = true;
         CreateMove::sendPacket2 = true;
 
@@ -68,13 +75,14 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 		NoFall::PrePredictionCreateMove(cmd);
 		NoFall::PostPredictionCreateMove(cmd);
 		PredictionSystem::StartPrediction(cmd);
+    Aimbot::PrePredictionCreateMove(cmd);
 			Aimbot::CreateMove(cmd);
 			fastStop::CreateMove(cmd);
 			Triggerbot::CreateMove(cmd);
 			ClanTagChanger::CreateMove();
 			FakeVote::CreateMove(cmd);
 			AutoKnife::CreateMove(cmd);
-			Airstuck::CreateMove(cmd);
+			Airstuck::CreateMove(cmd, bSend);
 			BackTrack::CreateMove(cmd);
 			FakeLag::CreateMove(cmd, bSend);
 			FakeWalk::CreateMove(cmd);

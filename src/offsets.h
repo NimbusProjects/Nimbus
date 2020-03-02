@@ -1,12 +1,24 @@
 #pragma once
 
 #include <cstddef>
+/*
+		std::ptrdiff_t m_bClientSideAnimation;
+		std::ptrdiff_t m_flLastClientSideAnimationFramecount;
+	under DT_BasePlayer
+    */
+
+/*
+extern bool clientSideAnimation;
+*/
+
 
 struct COffsets
 {
 	struct
 	{
-		std::ptrdiff_t m_Local;
+    std::ptrdiff_t m_bClientSideAnimation;
+		std::ptrdiff_t m_flLastClientSideAnimationFramecount;
+	  std::ptrdiff_t m_Local;
 		std::ptrdiff_t m_aimPunchAngle;
 		std::ptrdiff_t m_viewPunchAngle;
 		std::ptrdiff_t m_vecViewOffset;
@@ -286,7 +298,7 @@ namespace Offsets
 {
 	void GetNetVarOffsets();
 
-	extern unsigned int playerAnimStateOffset;
+	  extern unsigned int playerAnimStateOffset;
     extern unsigned int playerAnimOverlayOffset;
 }
 

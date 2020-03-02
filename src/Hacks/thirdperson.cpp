@@ -66,7 +66,6 @@ void ThirdPerson::FrameStageNotify(ClientFrameStage_t stage)
 	if (stage == ClientFrameStage_t::FRAME_RENDER_START && engine->IsInGame())
 	{
 		C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
-
 		if (localplayer && localplayer->GetAlive() && Settings::ThirdPerson::enabled && input->m_fCameraInThirdPerson)
 		{
       /*      switch (Settings::ThirdPerson::type)
