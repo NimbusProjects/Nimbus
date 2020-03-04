@@ -44,9 +44,13 @@ sudo dnf install cmake gcc-c++ gdb git libstdc++-static mesa-libGL-devel SDL2-de
 ===================
 
 #### Download Fuzion:
-
+Main Branch :
 ```bash
-git clone --recursive https://github.com/Zedespook/zedeware
+git clone --recursive https://github.com/DrunkenBlyatHvH/Apuware.git
+```
+Alternative branch Branch :
+```bash
+git clone --recursive --single-branch --branch <branchname> https://github.com/DrunkenBlyatHvH/Apuware.git
 ```
 
 ```bash
