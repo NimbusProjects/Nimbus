@@ -26,12 +26,21 @@ static void Resolve(C_BasePlayer* player, float feetYaw, float angleYaw, float m
     else if (player->GetVelocity().Length() < 75.77f)
     {
         player->GetEyeAngles()->y = *player->GetLowerBodyYawTarget();
+	    //this is an issue imo, players can break lby still -echo
+	    //is there a particular reason for doing this? desync is totally reliant on body poses, rather than old ticks being used to calculate hitboxes
+	    //the players eyeangles are fine, we should be fixing body poses for proper resolver.
         player->GetAnimState()->goalFeetYaw = (180.f + (angleYaw - feetYaw)) / 360.f;
+	    //issue with this is that it's not a proper goal feet calculation, shouldnt we be using the server side calculations with slight adjustment to it so to account for
+	    //those choking ticks?
+	    //for example, we can break this simply by micro moving while randomizing when we choke packets to force goal feet yaw to our choked eye angles
+	    // -echo pls dont mind the fucked up lines i did this on mobile <3
 
+	
         Math::NormalizeYaw(player->GetEyeAngles()->y);
 
         if (feetYaw >= -maxDelta & feetYaw < 0)
             player->GetAnimState()->goalFeetYaw -= maxDelta * 0.66f;
+	    //Why are we doing this? Players can desync less than maxdelta, and why are we using magic values? -echo
         else
             player->GetAnimState()->goalFeetYaw += maxDelta * 0.66f;
 
@@ -39,7 +48,8 @@ static void Resolve(C_BasePlayer* player, float feetYaw, float angleYaw, float m
 
 		for (int i = 0; i <= layers->Count(); i++)
 		{
-			float m_flPlaybackRate = layers->operator[](i).m_flPlaybackRate;
+			float m_flPlaybackRate = layers->operator[](i).m_flPlaybackRate; 
+			//this is still using animation layers to resolve owo -echo
 
 			if (m_flPlaybackRate > 0.1f)
 			{
