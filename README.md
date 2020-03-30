@@ -143,6 +143,12 @@ To add a config, copy the folder containing it to `~/.config/FuzionGH`
 ![esp](http://i.imgur.com/lnF42Ng.png)
 
 # Changelog
+Version 2! (Mar 29!)
+- Echo improved resolver!
+- Aimbot shoots alot better!
+- Broke backtracking for now!
+- Updated antiaims to work properly! Thank you brain!
+
 Version 1.3.0 (Feb 27)
 - Resolver updated
 - Various anti-aim changes
