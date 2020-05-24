@@ -294,7 +294,7 @@ static C_BasePlayer *GetClosestPlayerAndSpot(CUserCmd *cmd, C_BasePlayer *localp
 		Aimbot::targetAimbot = i;
 		Vector eVecTarget = player->GetBonePosition((int)Settings::Aimbot::bone);
 
-		if (Settings::Aimbot::AutoAim::closestBone)
+		if (Settings::Aimbot::AutoAim::closestBone && Settings::Aimbot::type != AimbotType::RAGE)
 		{
 			Vector tempSpot = GetClosestSpot(cmd, localplayer, player, aimTargetType);
 			if (tempSpot.IsZero() || !Entity::IsSpotVisibleThroughEnemies(player, tempSpot))
