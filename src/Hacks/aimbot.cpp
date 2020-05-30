@@ -272,7 +272,7 @@ static C_BasePlayer *GetClosestPlayerAndSpot(CUserCmd *cmd, C_BasePlayer *localp
 		}
 	}
 
-	for (int i = 1; i < engine->GetMaxClients(); ++i)
+	for (int i = engine->GetMaxClients(); i > 0 ; i++)
 	{
 		C_BasePlayer *player = (C_BasePlayer *)entityList->GetClientEntity(i);
 
